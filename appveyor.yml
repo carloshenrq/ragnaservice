@@ -1,0 +1,77 @@
+build: false
+clone_depth: 1
+clone_folder: c:\projects\ragnaservice
+
+configuration:
+- php56
+- php70
+- php71
+- php72
+
+services:
+  - mysql
+
+cache:
+    - '%LOCALAPPDATA%\Composer\files'
+    - c:\projects\ragnaservice\composer.phar
+
+init:
+    - SET PATH=C:\msys64\usr\bin;c:\php;C:\Program Files\MySQL\MySQL Server 5.7\bin\;C:\Ruby22\bin;%PATH%
+    - SET COMPOSER_NO_INTERACTION=1
+    - SET ANSICON=121x90 (121x90)
+    - REG ADD "HKEY_CURRENT_USER\Software\Microsoft\Command Processor" /v DelayedExpansion /t REG_DWORD /d 1 /f
+environment:
+  MYSQL_PORT: tcp://localhost:3306
+  MYSQL_PATH: C:\Program Files\MySql\MySQL Server 5.7
+  MYSQL_PWD: Password12!
+install:
+    - mkdir c:\memcached && cd c:\memcached
+    - appveyor DownloadFile https://github.com/carloshenrq/chzapp/releases/download/v0.1.2/memcached-win32-1.4.4-14.zip
+    - 7z x memcached-win32-1.4.4-14.zip -y >nul
+    - memcached.exe -d install
+    - memcached.exe -d start
+    - cd ..
+    - mkdir c:\rubyupdate && cd c:\rubyupdate
+    - appveyor DownloadFile https://rubygems.org/gems/rubygems-update-2.7.7.gem
+    - gem install --local rubygems-update-2.7.7.gem
+    - update_rubygems
+    - cd ..
+    - rmdir /s /q c:\rubyupdate
+    - cd \
+    - appveyor DownloadFile https://github.com/carloshenrq/chzapp/releases/download/v0.1.2/%CONFIGURATION%.zip
+    - 7z x %CONFIGURATION%.zip -y >nul
+    - del /Q *.zip
+    - copy /Y c:\projects\ragnaservice\build\appveyor-ci-apache-%CONFIGURATION% c:\Apache24\conf\httpd.conf
+    - cd c:\php
+    - appveyor DownloadFile https://raw.githubusercontent.com/symfony/binary-utils/master/cacert.pem
+    - echo curl.cainfo=c:\php\cacert.pem >> php.ini
+    - cd c:\projects\ragnaservice
+    - php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+    - php composer-setup.php
+    - php -r "unlink('composer-setup.php');"
+    - IF %APPVEYOR_REPO_BRANCH%==master (SET COMPOSER_ROOT_VERSION=dev-master) ELSE (SET COMPOSER_ROOT_VERSION=%APPVEYOR_REPO_BRANCH%.x-dev)
+    - php composer.phar update --no-progress --ansi
+    - SET COMPOSER_ROOT_VERSION=
+    - gem update --system
+    - gem install mime-types -v 2.99.1
+    - cd c:\Apache24\bin
+    - httpd -k install -n "Apache24"
+    - net start Apache24
+
+before_test:
+    - ruby -v
+    - gem -v
+    - bundle -v
+    - php -v
+    - mysql -e "CREATE USER 'ragnaservice'@'localhost' IDENTIFIED BY 'ragnaservice';" --user=root
+    - mysql -e "CREATE DATABASE ragnaservice;" --user=root
+    - mysql -e "GRANT SELECT ON ragnaservice.* TO 'ragnaservice'@'localhost';" --user=root
+
+test_script:
+    - cd c:\projects\ragnaservice
+    - vendor/bin/phpunit --coverage-clover=coverage.xml
+
+after_test:
+    - cd c:\projects\ragnaservice
+    - appveyor DownloadFile https://codecov.io/bash -FileName codecov.sh
+    - bash codecov.sh
