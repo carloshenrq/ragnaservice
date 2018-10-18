@@ -14,7 +14,8 @@
     </php>
 	<filter>
 		<whitelist processUncoveredFilesFromWhitelist="true">
-			<directory suffix=".php">app</directory>
+            <directory suffix=".php">app</directory>
+			<directory suffix=".php">app/Controller</directory>
 		</whitelist>
 	</filter>
 </phpunit>
