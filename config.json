@@ -1,0 +1,16 @@
+{
+    "connections": {
+        "default": {
+            "data": {
+                "driver": "mysql",
+                "host": "127.0.0.1",
+                "database": "ragnaservice",
+                "username": "ragnaservice",
+                "password": "ragnaservice",
+                "charset": "utf8",
+                "collation": "utf8_swedish_ci",
+                "prefix": ""
+            }
+        }
+    }
+}

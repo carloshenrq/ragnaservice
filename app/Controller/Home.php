@@ -19,10 +19,12 @@
 
 namespace Controller;
 
+use \Model\Token as Model_Token;
+
 class Home extends ControllerParser
 {
     public function index_GET($response, $args)
     {
-        return $response->write('Hello world');
+        return $response->withJson(Model_Token::defaultActive());
     }
 }
