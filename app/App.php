@@ -18,6 +18,7 @@
  */
 
 use Model\Token as Model_Token;
+use Model\Profile as Model_Profile;
 
 class App extends CHZApp\Application
 {
@@ -27,10 +28,17 @@ class App extends CHZApp\Application
      */
     private $installMode;
 
+    /**
+     * Perfil que está logado na aplicação.
+     * @var Model_Profile
+     */
+    private $profile;
+
     public function init()
     {
         // Define a aplicação em modo de instalação.
         $this->setInstallMode(true);
+        $this->profile = null;
 
         // Arquivo de configuração
         $configFile = realpath(join(DIRECTORY_SEPARATOR, [
@@ -54,10 +62,6 @@ class App extends CHZApp\Application
 
             // Define os dados de conexão com o BD.
             $this->setEloquentConfigs($config->connections);
-
-            // Obtém informações do manager.
-            $manager = $this->getEloquent()->getManager();
-            $pdo = $manager->getConnection('default')->getPdo();
         }
     }
 
@@ -72,8 +76,8 @@ class App extends CHZApp\Application
         if ($this->getInstallMode())
             return;
         
-        if (!$schema->hasTable('rs_token')) {
-            $schema->create('rs_token', function($table) {
+        if (!$schema->hasTable('token')) {
+            $schema->create('token', function($table) {
                 $table->engine = 'InnoDB';
                 $table->increments('id');
                 $table->string('token', 128)->unique();
@@ -82,7 +86,7 @@ class App extends CHZApp\Application
                 $table->integer('use_count')->unsigned()->default(0);
                 $table->dateTime('use_limit')->nullable();
                 $table->timestamps();
-            });
+           });
 
             // Cria o primeiro token de acesso ao sistema.
             Model_Token::create([
@@ -93,6 +97,67 @@ class App extends CHZApp\Application
                 'use_limit' => null
             ]);
         }
+
+        if (!$schema->hasTable('profile')) {
+            $schema->create('profile', function($table) {
+                $table->engine = 'InnoDB';
+                $table->increments('id');
+                $table->string('name', 256)->default('');
+                $table->enum('gender', ['M', 'F', 'O'])->nullable()->default('M');
+                $table->date('birthdate')->nullable();
+                $table->string('email', 60)->unique()->nullable();
+                $table->string('password', 128)->nullable();
+                $table->integer('permission')->unsigned()->default(0);
+                $table->boolean('blocked')->default(false);
+                $table->string('blocked_reason', 2048)->nullable();
+                $table->dateTime('blocked_until')->nullable();
+                $table->boolean('verified')->default(false);
+                $table->date('register_date');
+                $table->string('facebook_id', 30)->unique()->nullable();
+                $table->boolean('ga_enabled')->default(false);
+                $table->string('ga_secret', 16)->nullable();
+                $table->timestamps();
+
+                $table->index(['email', 'password']);
+            });
+
+            /**
+             * Cria o primeiro perfil do sistema.
+             */
+            Model_Profile::create([
+                'name' => 'Administrador',
+                'gender' => 'O',
+                'birthdate' => null,
+                'email' => 'a@a.com',
+                'password' => hash('sha512', 'admin'),
+                'permission' => 1073741825,
+                'blocked' => false,
+                'blocked_reason' => null,
+                'blocked_until' => null,
+                'verified' => true,
+                'register_date' => new DateTime(),
+                'facebook_id' => null,
+                'ga_enabled' => false,
+                'ga_secret' => null
+            ]);
+        }
+
+        if (!$schema->hasTable('token_profile')) {
+            $schema->create('token_profile', function($table) {
+                $table->engine = 'InnoDB';
+                $table->increments('id');
+                $table->integer('token_id')->unsigned();
+                $table->integer('profile_id')->unsigned();
+                $table->string('token', 128)->unique();
+                $table->integer('permission')->unsigned()->default(0);
+                $table->dateTime('expires_at');
+                $table->timestamps();
+
+                $table->foreign('token_id')->references('id')->on('token');
+                $table->foreign('profile_id')->references('id')->on('profile');
+            });
+        }
+
     }
 
     /**
@@ -113,5 +178,47 @@ class App extends CHZApp\Application
     public function getInstallMode()
     {
         return $this->installMode;
+    }
+
+    /**
+     * Define o perfil que está logado na aplicação para
+     * esta sessão.
+     * 
+     * @param Model_Profile $profile
+     */
+    public function setProfile(Model_Profile $profile)
+    {
+        $this->profile = $profile;
+    }
+
+    /**
+     * Obtém o perfil que está logado na aplicação para esta sessão.
+     * 
+     * @return Model_Profile
+     */
+    public function getProfile()
+    {
+        return $this->profile;
+    }
+
+    /**
+     * Obtém a permissão para o token que está sendo usado.
+     * Caso o usuário não esteja logado, será usado o padrão.
+     * 
+     * @return int
+     */
+    public function getPermission()
+    {
+        $profile = $this->getProfile();
+
+        // Informação de token para o usuário logado.
+        if (!is_null($profile))
+            return $profile->token->permission;
+        
+        // Dados do token por ID
+        $token = Model_Token::find(Model_Token::defaultActive()->id);
+
+        // Permissão do token para acesso de rota.
+        return $token->permission;
     }
 }

@@ -17,7 +17,94 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+require_once 'app/autoload.php';
+
 class AppTest extends PHPUnit\Framework\TestCase
 {
-	
+	public function setUp()
+	{
+		// Registra o autoload para o site.
+		Autoload::register();
+	}
+
+	public function testAppInstance2()
+	{
+		$configFile = join(DIRECTORY_SEPARATOR, [
+			__DIR__,
+			'..',
+			'config.json'
+		]);
+
+		if (file_exists($configFile))
+			unlink($configFile);
+
+		$configFileFrom = realpath(join(DIRECTORY_SEPARATOR, [
+			__DIR__,
+			'..',
+			'build',
+			'config.json'
+		]));
+
+		$copyResult = copy($configFileFrom, $configFile);
+		$this->assertTrue($copyResult);
+
+		$app = $this->getMockBuilder('App')
+					->enableOriginalConstructor()
+					->setConstructorArgs([])
+					->enableProxyingToOriginalMethods()
+					->setMethods(['getException'])
+					->getMock();
+	}
+
+	/**
+	 * @expectedException Exception
+	 */
+	public function testAppInstance1()
+	{
+		$configFile = realpath(join(DIRECTORY_SEPARATOR, [
+			__DIR__,
+			'..',
+			'build',
+			'config-error.json'
+		]));
+
+		$configCopy = join(DIRECTORY_SEPARATOR, [
+			__DIR__,
+			'..',
+			'config.json'
+		]);
+
+		$copyResult = copy($configFile, $configCopy);
+		$this->assertTrue($copyResult);
+
+		$app = $this->getMockBuilder('App')
+					->enableOriginalConstructor()
+					->setConstructorArgs([])
+					->enableProxyingToOriginalMethods()
+					->setMethods(['getException'])
+					->getMock();
+	}
+
+	public function testAppInstance0()
+	{
+		$configFile = realpath(join(DIRECTORY_SEPARATOR, [
+			__DIR__,
+			'..',
+			'config.json'
+		]));
+
+		if ($configFile !== false)
+			unlink($configFile);
+
+		$app = $this->getMockBuilder('App')
+					->enableOriginalConstructor()
+					->setConstructorArgs([])
+					->enableProxyingToOriginalMethods()
+					->setMethods(['getException'])
+					->getMock();
+
+		$this->assertInstanceOf('CHZApp\Application', $app);
+
+		$app->installSchemaDefault(null);
+	}
 }

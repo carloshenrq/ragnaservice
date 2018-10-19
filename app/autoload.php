@@ -56,6 +56,3 @@ final class Autoload
             require_once $classFile;
     }
 }
-
-// Registra o autoload para o site.
-Autoload::register();

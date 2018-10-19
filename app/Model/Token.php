@@ -26,6 +26,11 @@ use \Illuminate\Database\Eloquent\Model as Eloquent_Model;
  */
 class Token extends Eloquent_Model
 {
+    public function tokenProfile()
+    {
+        return $this->hasMany('\Model\TokenProfile', 'id', 'token_id');
+    }
+
     /**
      * Obtém o token padrão que está ativo
      * e pode ser usado para requisições normais.
@@ -44,14 +49,18 @@ class Token extends Eloquent_Model
             return (is_null($t->use_limit) ||
                 $t->use_limit->format('Y-m-d H:i:s') >= $now->format('Y-m-d H:i:s'));
         })->map(function($t) {
-            return [
+            $profiles = $t->tokenProfile->count();
+            return (object)[
+                'id' => $t->id,
                 'token' => $t->token,
-                'expires_at' => ((is_null($t->use_limit)) ? null : $t->use_limit->format('Y-m-d H:i:s'))
+                'expires_at' => ((is_null($t->use_limit)) ? null : $t->use_limit->format('Y-m-d H:i:s')),
+                'connected' => $profiles
             ];
         })->first();
     }
 
-    protected $table = 'rs_token';
+    protected $table = 'token';
+    protected $connection = 'default';
 
     protected $fillable = [
         'token', 'permission', 'enabled', 'use_count', 'use_limit'

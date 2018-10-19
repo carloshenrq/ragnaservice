@@ -20,5 +20,8 @@
 require_once 'vendor/autoload.php';
 require_once 'app/autoload.php';
 
-$app = new App();
+// Registra o autoload para o site.
+Autoload::register();
+
+$app = new App(true);
 $app->run();

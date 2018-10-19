@@ -20,8 +20,60 @@
 namespace Controller;
 
 use \CHZApp\Controller as CHZApp_Controller;
+use \Psr\Http\Message\ServerRequestInterface;
+use \Psr\Http\Message\ResponseInterface;
+
+use \Model\TokenProfile as Model_TokenProfile;
 
 abstract class ControllerParser extends CHZApp_Controller
 {
-    
+    public function __router(ServerRequestInterface $request, ResponseInterface $response, $args)
+    {
+        try
+        {
+            // Verifica se a requisição foi realizada utilizando um token
+            // de acesso.
+            $tokenInfo = $request->getHeaderLine('HTTP_X_REQUEST_APPTOKEN');
+            
+            if (!empty($tokenInfo)) {
+                // Obtém o token que o usuário está usando em sua conexão...
+                $token = Model_TokenProfile::where([
+                    ['token', '=', $tokenInfo],
+                    ['expires_at', '>=', (new \DateTime())->format('Y-m-d H:i:s')]
+                ])->first();
+
+                // Caso não exista o token, será retornado uma exception.
+                if (is_null($token))
+                    throw new \Exception(_("Token informado não é válido para esta requisição."));
+
+                // Caso o token não esteja autorizado a fazer o login
+                // então exclui e manda a mensagem
+                if  (!($token->permission&1)) {
+                    $token->delete();
+                    throw new \Exception(_("O Token informado não está autorizado."));
+                }
+
+                if ($token->mainToken->enabled) {
+                    // Atualiza o tempo de expire do token para
+                    // atual + 10 minutos
+                    $token->expires_at = (new \DateTime())->add(date_interval_create_from_date_string('10 minutes'));
+                    $token->save();
+
+                    // Obtém o perfil que está vinculado a este token
+                    // para poder definir na aplicação...
+                    $this->getApplication()->setProfile($token->profile);
+                }
+            }
+        }
+        catch(\Exception $ex)
+        {
+            return $response->withJson([
+                'error' => true,
+                'message' => $ex->getMessage(),
+                'trace' => $ex->getTraceAsString(),
+            ]);
+        }
+
+        return parent::__router($request, $response, $args);
+    }
 }

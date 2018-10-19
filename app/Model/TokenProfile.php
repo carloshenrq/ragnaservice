@@ -17,21 +17,36 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Controller;
+namespace Model;
 
-use \Model\Token as Model_Token;
+use \Illuminate\Database\Eloquent\Model as Eloquent_Model;
 
-class Home extends ControllerParser
+class TokenProfile extends Eloquent_Model
 {
-    public function init()
+    public function mainToken()
     {
-        $this->addRouteRestriction('index_GET', function() {
-            return ($this->getApplication()->getPermission()&1) == 1;
-        });
+        return $this->belongsTo('\Model\Token', 'token_id', 'id');
     }
 
-    public function index_GET($response, $args)
+    public function profile()
     {
-        return $response->withJson(Model_Token::defaultActive());
+        return $this->belongsTo('\Model\Profile', 'profile_id', 'id');
     }
+
+    protected $table = 'token_profile';
+    protected $connection = 'default';
+
+    protected $fillable = [
+        'token_id', 'profile_id', 'token', 'permission', 'expires_at'
+    ];
+
+    protected $dates = [
+        'expires_at', 'created_at', 'updated_at'
+    ];
+
+    protected $casts = [
+        'token_id' => 'integer',
+        'profile_id' => 'integer',
+        'permission' => 'integer',
+    ];
 }

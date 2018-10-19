@@ -44,6 +44,7 @@ install:
     - copy /Y c:\projects\ragnaservice\build\appveyor-ci-apache-%CONFIGURATION% c:\Apache24\conf\httpd.conf
     - cd c:\php
     - appveyor DownloadFile https://raw.githubusercontent.com/symfony/binary-utils/master/cacert.pem
+    - echo extension=php_gettext.dll >> php.ini
     - echo curl.cainfo=c:\php\cacert.pem >> php.ini
     - cd c:\projects\ragnaservice
     - php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
@@ -65,7 +66,7 @@ before_test:
     - php -v
     - mysql -e "CREATE USER 'ragnaservice'@'localhost' IDENTIFIED BY 'ragnaservice';" --user=root
     - mysql -e "CREATE DATABASE ragnaservice;" --user=root
-    - mysql -e "GRANT SELECT ON ragnaservice.* TO 'ragnaservice'@'localhost';" --user=root
+    - mysql -e "GRANT ALL PRIVILEGES ON ragnaservice.* TO 'ragnaservice'@'localhost';" --user=root
 
 test_script:
     - cd c:\projects\ragnaservice
