@@ -40,6 +40,24 @@ class App extends CHZApp\Application
      */
     private $config;
 
+    /**
+     * Define o idioma de uso
+     * @var string
+     */
+    private $lang;
+
+    /**
+     * Define informações de tradução
+     * @var boolean
+     */
+    private $langLoaded;
+
+    /**
+     * Dados de tradução para o painel de controle.
+     * @var array
+     */
+    private $langTranslate;
+
     public function init()
     {
         // Define a aplicação em modo de instalação.
@@ -61,7 +79,7 @@ class App extends CHZApp\Application
             $config = json_decode($configContent);
 
             if (is_null($config))
-                throw new Exception(_("Falha na leitura do arquivo de configuração."));
+                throw new Exception(__t("Falha na leitura do arquivo de configuração."));
 
             // Define as configurações da aplicação.
             $this->setConfig($config);
@@ -72,6 +90,7 @@ class App extends CHZApp\Application
             // Define os dados de conexão com o BD.
             $this->setEloquentConfigs($config->connections);
             $this->registerModels();
+            $this->loadLanguage();
         }
     }
 
@@ -128,6 +147,7 @@ class App extends CHZApp\Application
                 $table->string('facebook_id', 30)->unique()->nullable();
                 $table->boolean('ga_enabled')->default(false);
                 $table->string('ga_secret', 16)->nullable();
+                $table->string('language', 30)->nullable();
                 $table->timestamps();
 
                 $table->index(['email', 'password']);
@@ -195,7 +215,7 @@ class App extends CHZApp\Application
                 'register_date' => new DateTime(),
                 'facebook_id' => null,
                 'ga_enabled' => false,
-                'ga_secret' => null
+                'ga_secret' => null,
             ]);
         }
     }
@@ -229,6 +249,13 @@ class App extends CHZApp\Application
     public function setProfile(Model_Profile $profile)
     {
         $this->profile = $profile;
+
+        if (empty($this->profile->language))
+            $this->profile->update([
+                'language' => $this->getConfig()->language,
+            ]);
+
+        $this->setLang($this->profile->language);
     }
 
     /**
@@ -270,6 +297,7 @@ class App extends CHZApp\Application
     public function setConfig($config)
     {
         $this->config = $config;
+        $this->setLang($this->config->language);
     }
 
     /**
@@ -280,6 +308,27 @@ class App extends CHZApp\Application
     public function getConfig()
     {
         return $this->config;
+    }
+
+    /**
+     * Define a linguagem de uso do sistema.
+     *
+     * @param string $lang
+     */
+    public function setLang($lang)
+    {
+        $this->langLoaded = ($this->lang === $lang);
+        $this->lang = $lang;
+    }
+
+    /**
+     * Obtem a linguagem de uso do sistema.
+     *
+     * @return string
+     */
+    public function getLang()
+    {
+        return $this->lang;
     }
 
     /**
@@ -303,5 +352,38 @@ class App extends CHZApp\Application
             call_user_func([$modelClass, 'flushEventListeners']);
             call_user_func([$modelClass, 'boot']);
         }
+    }
+
+    /**
+     * Carrega o arquivo de traduções para o sistema
+     */
+    public function loadLanguage()
+    {
+        if ($this->langLoaded)
+            return;
+
+        // Arquivo de linguagem solicitado...
+        $langFile = join(DIRECTORY_SEPARATOR, [
+            __DIR__, '..', 'lang', $this->getLang() . '.php'
+        ]);
+
+        // Se não existir o arquivo de linguagem, então
+        // será usado o idioma padrão
+        if (file_exists($langFile))
+            $this->langTranslate = require_once($langFile);
+
+        $this->langLoaded = true;
+    }
+
+    /**
+     * Obtém uma tradução para a mensagem enviada e para o arquivo informado.
+     *
+     * @param string $message
+     *
+     * @return string Mensagem traduzida...
+     */
+    public function getTranslate($message)
+    {
+        return ((isset($this->langTranslate[$message])) ? $this->langTranslate[$message] : $message);
     }
 }

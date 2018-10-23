@@ -52,13 +52,13 @@ abstract class ControllerParser extends CHZApp_Controller
 
                 // Caso não exista o token, será retornado uma exception.
                 if (is_null($token))
-                    throw new \Exception(_("Token informado não é válido para esta requisição."));
+                    throw new \Exception(__t("Token informado não é válido para esta requisição."));
 
                 // Caso o token não esteja autorizado a fazer o login
                 // então exclui e manda a mensagem
                 if  (!($token->permission&1)) {
                     $token->delete();
-                    throw new \Exception(_("O Token informado não está autorizado."));
+                    throw new \Exception(__t("O Token informado não está autorizado."));
                 }
 
                 if ($token->mainToken->enabled) {

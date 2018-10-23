@@ -56,3 +56,15 @@ final class Autoload
             require_once $classFile;
     }
 }
+
+/**
+ * Realiza a tradução das strings que forem solicitadas.
+ * 
+ * @param string $message Mensagem a ser traduzida
+ *
+ * @return string Mensagem traduzida.
+ */
+function __t($message)
+{
+    return App::getInstance()->getTranslate($message);
+}

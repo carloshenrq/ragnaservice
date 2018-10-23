@@ -65,7 +65,7 @@ class Profile extends ControllerParser
         // Retorna informações de update para a tela.
         return $response->withJson([
             'success' => true,
-            'message' => _('Informações de Perfil foram atualizadas com sucesso')
+            'message' => __t('Informações de Perfil foram atualizadas com sucesso')
         ]);
     }
 
@@ -84,26 +84,26 @@ class Profile extends ControllerParser
         if ($profile->password !== hash('sha512', $old_pass))
             return $response->withJson([
                 'error' => true,
-                'message' => _('A Senha atual informada não confere com a senha atual.')
+                'message' => __t('A Senha atual informada não confere com a senha atual.')
             ]);
         
         if (hash('sha512', $new_pass) !== hash('sha512', $cnf_pass))
             return $response->withJson([
                 'error' => true,
-                'message' => _('As novas senhas digitadas não conferem.')
+                'message' => __t('As novas senhas digitadas não conferem.')
             ]);
         
         if (hash('sha512', $old_pass) === hash('sha512', $new_pass))
             return $response->withJson([
                 'error' => true,
-                'message' => _('Sua nova senha, não pode ser igual antiga.')
+                'message' => __t('Sua nova senha, não pode ser igual antiga.')
             ]);
     
         $profile->changePassword($new_pass);
 
         return $response->withJson([
             'success' => true,
-            'message' => _('Senha foi alterada com sucesso.')
+            'message' => __t('Senha foi alterada com sucesso.')
         ]);
     }
 
@@ -128,7 +128,7 @@ class Profile extends ControllerParser
         if ($existing)
             return $response->withJson([
                 'error' => true,
-                'message' => _('O Endereço de e-mail informado já foi utilizado.')
+                'message' => __t('O Endereço de e-mail informado já foi utilizado.')
             ]);
 
         // Tentativa de criação da conta.
@@ -153,7 +153,7 @@ class Profile extends ControllerParser
         return $response->withJson([
             'success' => true,
             'verified' => $profile->verified,
-            'message' => _('Perfil criado com sucesso.'),
+            'message' => __t('Perfil criado com sucesso.'),
         ]);
     }
 
@@ -181,7 +181,7 @@ class Profile extends ControllerParser
         if (is_null($verify))
             return $response->withJson([
                 'error' => true,
-                'message' => _('O Código de verificação informado já foi usado ou não existe.'),
+                'message' => __t('O Código de verificação informado já foi usado ou não existe.'),
             ]);
 
         $verify->used = true;
@@ -190,7 +190,7 @@ class Profile extends ControllerParser
 
         return $response->withJson([
             'success' => true,
-            'message' => _('Seu perfil foi verificado com sucesso.')
+            'message' => __t('Seu perfil foi verificado com sucesso.')
         ]);
     }
 
@@ -206,7 +206,7 @@ class Profile extends ControllerParser
         if ($profile->verified)
             return $response->withJson([
                 'error' => true,
-                'message' => _('Este perfil já está verificado.')
+                'message' => __t('Este perfil já está verificado.')
             ]);
 
         // Informações sobre o perfil verificado...
@@ -230,7 +230,7 @@ class Profile extends ControllerParser
 
         return $response->withJson([
             'success' => true,
-            'message' => _('E-mail de confirmação foi enviado para o e-mail do perfil')
+            'message' => __t('E-mail de confirmação foi enviado para o e-mail do perfil')
         ]);
     }
 
@@ -248,7 +248,7 @@ class Profile extends ControllerParser
         if (is_null($reset))
             return $response->withJson([
                 'error' => true,
-                'message' => _('Código de reset de senha não é valido ou já foi usado.')
+                'message' => __t('Código de reset de senha não é valido ou já foi usado.')
             ]);
 
         $reset->used = true;
@@ -257,7 +257,7 @@ class Profile extends ControllerParser
 
         return $response->withJson([
             'success' => true,
-            'message' => _('Senha resetada com sucesso. Verifique seu e-mail.')
+            'message' => __t('Senha resetada com sucesso. Verifique seu e-mail.')
         ]);
     }
 
@@ -277,7 +277,7 @@ class Profile extends ControllerParser
         if (is_null($profile))
             return $response->withJson([
                 'error' => true,
-                'message' => _('Endereço de e-mail não pertence a nenhum perfil.'),
+                'message' => __t('Endereço de e-mail não pertence a nenhum perfil.'),
             ]);
 
         // Obtém o reset que está em memória para enviar o proprio pedido novamente...
@@ -303,7 +303,7 @@ class Profile extends ControllerParser
 
         return $response->withJson([
             'success' => true,
-            'message' => _('Reset de senha foi enviado para o e-mail do perfil')
+            'message' => __t('Reset de senha foi enviado para o e-mail do perfil')
         ]);
     }
 
@@ -325,7 +325,7 @@ class Profile extends ControllerParser
         if (!($token instanceof Model_TokenProfile))
             return $response->withJson([
                 'error' => true,
-                'message' => _("Nome de usuário e senha inválidos ou cadastro bloqueado.")
+                'message' => __t("Nome de usuário e senha inválidos ou cadastro bloqueado.")
             ]);
 
         return $response->withJson([

@@ -13,6 +13,7 @@
             }
         }
     },
+    "language":"pt_BR",
     "profile" : {
         "verification":true,
         "expires_after":180,
