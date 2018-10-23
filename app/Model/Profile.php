@@ -20,12 +20,46 @@
 namespace Model;
 
 use \Illuminate\Database\Eloquent\Model as Eloquent_Model;
+use \Model\Observer\ProfileObserver as Observer_Profile;
 
 class Profile extends Eloquent_Model
 {
     public function token()
     {
         return $this->hasOne('\Model\TokenProfile');
+    }
+
+    public function verifications()
+    {
+        return $this->hasMany('\Model\ProfileVerify', 'profile_id', 'id');
+    }
+
+    public function resets()
+    {
+        return $this->hasMany('\Model\ProfileReset', 'profile_id', 'id');
+    }
+
+    /**
+     * Faz alterações de informações padrões do perfil
+     * do usuários
+     */
+    public function changeSettings($name, $gender, $birthdate)
+    {
+        $this->name = $name;
+        $this->gender = $gender;
+        $this->birthdate = $birthdate;
+        $this->save();
+    }
+
+    /**
+     * Define a nova senha para o profile.
+     * 
+     * @param string $new_password Nova senha
+     */
+    public function changePassword($new_password)
+    {
+        $this->password = hash('sha512', $new_password);
+        $this->save();
     }
 
     /**
@@ -90,4 +124,13 @@ class Profile extends Eloquent_Model
         'verified' => 'boolean',
         'ga_enabled' => 'boolean'
     ];
+
+    /**
+     * @see Eloquent_Model::boot()
+     */
+    public static function boot()
+    {
+        parent::boot();
+        self::observe(new Observer_Profile());
+    }
 }

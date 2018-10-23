@@ -34,6 +34,12 @@ class App extends CHZApp\Application
      */
     private $profile;
 
+    /**
+     * Dados de configuração da aplicação.
+     * @var stdObject
+     */
+    private $config;
+
     public function init()
     {
         // Define a aplicação em modo de instalação.
@@ -57,11 +63,15 @@ class App extends CHZApp\Application
             if (is_null($config))
                 throw new Exception(_("Falha na leitura do arquivo de configuração."));
 
+            // Define as configurações da aplicação.
+            $this->setConfig($config);
+
             // Identifica que não está em modo de instalação
             $this->setInstallMode(false);
 
             // Define os dados de conexão com o BD.
             $this->setEloquentConfigs($config->connections);
+            $this->registerModels();
         }
     }
 
@@ -76,6 +86,8 @@ class App extends CHZApp\Application
         if ($this->getInstallMode())
             return;
         
+        $profileCreated = true;
+
         if (!$schema->hasTable('token')) {
             $schema->create('token', function($table) {
                 $table->engine = 'InnoDB';
@@ -98,7 +110,7 @@ class App extends CHZApp\Application
             ]);
         }
 
-        if (!$schema->hasTable('profile')) {
+        if (!($profileCreated = $schema->hasTable('profile'))) {
             $schema->create('profile', function($table) {
                 $table->engine = 'InnoDB';
                 $table->increments('id');
@@ -120,26 +132,6 @@ class App extends CHZApp\Application
 
                 $table->index(['email', 'password']);
             });
-
-            /**
-             * Cria o primeiro perfil do sistema.
-             */
-            Model_Profile::create([
-                'name' => 'Administrador',
-                'gender' => 'O',
-                'birthdate' => null,
-                'email' => 'a@a.com',
-                'password' => hash('sha512', 'admin'),
-                'permission' => 1073741825,
-                'blocked' => false,
-                'blocked_reason' => null,
-                'blocked_until' => null,
-                'verified' => true,
-                'register_date' => new DateTime(),
-                'facebook_id' => null,
-                'ga_enabled' => false,
-                'ga_secret' => null
-            ]);
         }
 
         if (!$schema->hasTable('token_profile')) {
@@ -158,6 +150,54 @@ class App extends CHZApp\Application
             });
         }
 
+        if (!$schema->hasTable('profile_verify')) {
+            $schema->create('profile_verify', function($table) {
+                $table->engine = 'InnoDB';
+                $table->increments('id');
+                $table->integer('profile_id')->unsigned();
+                $table->string('code', 32)->unique();
+                $table->boolean('used')->default(false);
+                $table->dateTime('used_at')->nullable();
+                $table->dateTime('expires_at');
+                $table->timestamps();
+
+                $table->foreign('profile_id')->references('id')->on('profile');
+            });
+        }
+
+        if (!$schema->hasTable('profile_reset')) {
+            $schema->create('profile_reset', function($table) {
+                $table->engine = 'InnoDB';
+                $table->increments('id');
+                $table->integer('profile_id')->unsigned();
+                $table->string('code', 32)->unique();
+                $table->boolean('used')->default(false);
+                $table->dateTime('used_at')->nullable();
+                $table->dateTime('expires_at');
+                $table->timestamps();
+
+                $table->foreign('profile_id')->references('id')->on('profile');
+            });
+        }
+
+        if (!$profileCreated) {
+            Model_Profile::create([
+                'name' => 'Administrador',
+                'gender' => 'O',
+                'birthdate' => null,
+                'email' => 'a@a.com',
+                'password' => hash('sha512', 'admin'),
+                'permission' => 3,
+                'blocked' => false,
+                'blocked_reason' => null,
+                'blocked_until' => null,
+                'verified' => true,
+                'register_date' => new DateTime(),
+                'facebook_id' => null,
+                'ga_enabled' => false,
+                'ga_secret' => null
+            ]);
+        }
     }
 
     /**
@@ -220,5 +260,48 @@ class App extends CHZApp\Application
 
         // Permissão do token para acesso de rota.
         return $token->permission;
+    }
+
+    /**
+     * Define as configurações para a aplicação.
+     * 
+     * @param object $config
+     */
+    public function setConfig($config)
+    {
+        $this->config = $config;
+    }
+
+    /**
+     * Obtém as configurações de aplicação.
+     * 
+     * @return object
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+    /**
+     * Método garante a chamada de todos os models a serem registrados...
+     */
+    private function registerModels()
+    {
+        $modelDir = join(DIRECTORY_SEPARATOR, [
+            __DIR__, 'Model'
+        ]);
+        $dirModel = new \DirectoryIterator($modelDir);
+        $modelClasses = [];
+
+        foreach($dirModel as $fileModel) {
+            if ($fileModel->isDot() || $fileModel->isDir())
+                continue;
+
+            // Retira a extensão '.php' do final do arquivo
+            // e atribui ao vetor de models...
+            $modelClass = '\\Model\\' . substr($fileModel->getFilename(), 0, -4);
+            call_user_func([$modelClass, 'flushEventListeners']);
+            call_user_func([$modelClass, 'boot']);
+        }
     }
 }

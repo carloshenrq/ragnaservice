@@ -27,6 +27,14 @@ use \Model\TokenProfile as Model_TokenProfile;
 
 abstract class ControllerParser extends CHZApp_Controller
 {
+    /**
+     * @see \App::getConfig()
+     */
+    public function getConfig()
+    {
+        return $this->getApplication()->getConfig();
+    }
+
     public function __router(ServerRequestInterface $request, ResponseInterface $response, $args)
     {
         try
