@@ -1,0 +1,14 @@
+{extends file='mail.html'}
+
+{block name="MAIL_BODY"}
+	
+	<p>{__t('Sua senha foi resetada com sucesso.')}</p>
+	<p>{__t('Agora você já pode fazer login usando sua nova senha.')}</p>
+
+	<div class="mail-code">
+		{$new_password}
+	</div>
+	
+	<p>{__t('Estamos aqui sempre para ajudar. Tenha um bom dia.')}</p>
+
+{/block}

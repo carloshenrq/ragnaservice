@@ -42,4 +42,28 @@ return [
     'Endereço de e-mail não pertence a nenhum perfil.' => '',
     'Reset de senha foi enviado para o e-mail do perfil' => '',
     'Nome de usuário e senha inválidos ou cadastro bloqueado.' => '',
+
+    // app/View/mail.html
+    'Olá <strong>%s</strong>!' => '',
+    'Este e-mail foi enviado para <u><i>%s</i></u> às <u><i>%s</i></u> por <u><i>%s</i></u>.' => '',
+    'Caso este e-mail tenha sido enviado de forma incorreta, por favor, desconsidere.' => '',
+
+    // app/View/mail-verify-code.html
+    'Verificação de Contas' => '',
+    'Nós agradecemos seu registro, mas temos mais um passo antes de você possuir acesso completo!' => '',
+    'É necessário que você use o código abaixo na tela de confirmação para concluir seu cadastro.' => '',
+    'Após inserir corretamente este código na tela de confirmação, sua conta será validada com sucesso.' => '',
+    'Este código possui validade até <u>%s</u>.' => '',
+
+    // app/View/mail-reset-code.html
+    'Resetar Senha' => '',
+    'Parece que você perdeu sua senha! Não se preocupe, estamos aqui para ajudar.' => '',
+    'Para concluir a recuperação de senha, precisamos que você insira o código abaixo na tela de confirmação.' => '',
+    'Logo após inserir este código, você receberá uma nova senha.' => '',
+
+    // app/View/mail-reset-pass.html
+    'Senha resetada com sucesso' => '',
+    'Sua senha foi resetada com sucesso.' => '',
+    'Agora você já pode fazer login usando sua nova senha.' => '',
+    'Estamos aqui sempre para ajudar. Tenha um bom dia.' => '',
 ];

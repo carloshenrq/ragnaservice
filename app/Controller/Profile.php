@@ -344,9 +344,16 @@ class Profile extends ControllerParser
      */
     public static function sendResetPass(Model_ProfileReset $reset, $password)
     {
-        // Obtém o mailer para envio dos dados.
-        $mailer = \App::getInstance()->getMailer();
-        $profile = $reset->profile;
+        // Faz o envio do e-mail
+        ControllerParser::sendMail(
+            __t('Senha resetada com sucesso'),
+            [$reset->profile->email => $reset->profile->name],
+            'mail-reset-pass.html',
+            [
+                'profile' => $reset->profile,
+                'new_password' => $password,
+                'now' => new \DateTime(),
+            ]);
     }
 
     /**
@@ -354,9 +361,16 @@ class Profile extends ControllerParser
      */
     public static function sendResetCode(Model_ProfileReset $reset)
     {
-        // Obtém o mailer para envio dos dados.
-        $mailer = \App::getInstance()->getMailer();
-        $profile = $reset->profile;
+        // Faz o envio do e-mail
+        ControllerParser::sendMail(
+            __t('Resetar Senha'),
+            [$reset->profile->email => $reset->profile->name],
+            'mail-reset-code.html',
+            [
+                'profile' => $reset->profile,
+                'reset' => $reset,
+                'now' => new \DateTime(),
+            ]);
     }
 
     /**
@@ -366,8 +380,15 @@ class Profile extends ControllerParser
      */
     public static function sendVerifyCode(Model_ProfileVerify $verify)
     {
-        // Obtém o mailer para envio dos dados.
-        $mailer = \App::getInstance()->getMailer();
-        $profile = $verify->profile;
+        // Faz o envio do e-mail
+        ControllerParser::sendMail(
+            __t('Verificação de Contas'),
+            [$verify->profile->email => $verify->profile->name],
+            'mail-verify-code.html',
+            [
+                'profile' => $verify->profile,
+                'verify' => $verify,
+                'now' => new \DateTime(),
+           ]);
     }
 }

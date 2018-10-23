@@ -9,7 +9,7 @@
     "require": {
         "php":">=5.6",
         "ext-gettext":"*",
-        "carloshlfz/framework": "^0.1.4"
+        "carloshlfz/framework": "^0.1.5"
     },
     "autoload" : {
         "files" : ["app/autoload.php"]

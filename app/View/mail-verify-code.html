@@ -1,0 +1,15 @@
+{extends file='mail.html'}
+
+{block name="MAIL_BODY"}
+	
+	<p>{__t('Nós agradecemos seu registro, mas temos mais um passo antes de você possuir acesso completo!')}</p>
+	<p>{__t('É necessário que você use o código abaixo na tela de confirmação para concluir seu cadastro.')}</p>
+
+	<div class="mail-code">
+		{$verify->code}
+	</div>
+	
+	<p>{__t('Após inserir corretamente este código na tela de confirmação, sua conta será validada com sucesso.')}</p>
+	<p>{sprintf(__t('Este código possui validade até <u>%s</u>.'), $verify->expires_at->format('Y-m-d H:i:s'))}</p>
+
+{/block}

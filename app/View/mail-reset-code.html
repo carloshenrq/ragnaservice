@@ -1,0 +1,15 @@
+{extends file='mail.html'}
+
+{block name="MAIL_BODY"}
+	
+	<p>{__t('Parece que você perdeu sua senha! Não se preocupe, estamos aqui para ajudar.')}</p>
+	<p>{__t('Para concluir a recuperação de senha, precisamos que você insira o código abaixo na tela de confirmação.')}</p>
+
+	<div class="mail-code">
+		{$reset->code}
+	</div>
+	
+	<p>{__t('Logo após inserir este código, você receberá uma nova senha.')}</p>
+	<p>{sprintf(__t('Este código possui validade até <u>%s</u>.'), $reset->expires_at->format('Y-m-d H:i:s'))}</p>
+
+{/block}

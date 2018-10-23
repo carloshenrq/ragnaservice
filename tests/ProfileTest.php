@@ -61,7 +61,8 @@ class ProfileTest extends PHPUnit\Framework\TestCase
         $environment['REQUEST_METHOD'] = 'POST';
         $environment['REQUEST_URI'] = '/profile/login';
         $environment['CONTENT_TYPE'] = 'multipart/form-data';
-        
+        $environment['SERVER_NAME'] = 'app-travis-debug';
+
         $_POST['email'] = 'a@a.com';
         $_POST['password'] = 'admin';
 
@@ -83,6 +84,7 @@ class ProfileTest extends PHPUnit\Framework\TestCase
         $environment['REQUEST_URI'] = '/profile/change/settings';
         $environment['CONTENT_TYPE'] = 'multipart/form-data';
         $environment['HTTP_X_REQUEST_APPTOKEN'] = $token;
+        $environment['SERVER_NAME'] = 'app-travis-debug';
 
         $_POST['name'] = 'Brazil hue test';
         $_POST['gender'] = 'M';
@@ -108,7 +110,8 @@ class ProfileTest extends PHPUnit\Framework\TestCase
         $environment['REQUEST_METHOD'] = 'POST';
         $environment['REQUEST_URI'] = '/profile/login';
         $environment['CONTENT_TYPE'] = 'multipart/form-data';
-        
+        $environment['SERVER_NAME'] = 'app-travis-debug';
+
         $_POST['email'] = 'a@a.com';
         $_POST['password'] = 'admin';
 
@@ -130,6 +133,7 @@ class ProfileTest extends PHPUnit\Framework\TestCase
         $environment['REQUEST_URI'] = '/profile/change/settings';
         $environment['CONTENT_TYPE'] = 'multipart/form-data';
         $environment['HTTP_X_REQUEST_APPTOKEN'] = $token;
+        $environment['SERVER_NAME'] = 'app-travis-debug';
 
         $_POST['name'] = 'Brazil hue test2';
         $_POST['gender'] = 'F';
@@ -155,7 +159,8 @@ class ProfileTest extends PHPUnit\Framework\TestCase
 		$environment['REQUEST_METHOD'] = 'POST';
 		$environment['REQUEST_URI'] = '/profile/login';
         $environment['CONTENT_TYPE'] = 'multipart/form-data';
-        
+        $environment['SERVER_NAME'] = 'app-travis-debug';
+
 		$_POST['email'] = 'a@a.com';
 		$_POST['password'] = 'admin';
 
@@ -177,7 +182,8 @@ class ProfileTest extends PHPUnit\Framework\TestCase
 		$environment['REQUEST_URI'] = '/profile/change/password';
         $environment['CONTENT_TYPE'] = 'multipart/form-data';
         $environment['HTTP_X_REQUEST_APPTOKEN'] = $token;
-        
+        $environment['SERVER_NAME'] = 'app-travis-debug';
+
 		$_POST['old_pass'] = 'admin';
 		$_POST['new_pass'] = 'admin12';
 		$_POST['cnf_pass'] = 'admin12';
@@ -199,7 +205,8 @@ class ProfileTest extends PHPUnit\Framework\TestCase
 		$environment['REQUEST_URI'] = '/profile/change/password';
         $environment['CONTENT_TYPE'] = 'multipart/form-data';
         $environment['HTTP_X_REQUEST_APPTOKEN'] = $token;
-        
+        $environment['SERVER_NAME'] = 'app-travis-debug';
+
 		$_POST['old_pass'] = 'admin12';
 		$_POST['new_pass'] = 'admin';
 		$_POST['cnf_pass'] = 'admin';
@@ -224,7 +231,8 @@ class ProfileTest extends PHPUnit\Framework\TestCase
 		$environment['REQUEST_METHOD'] = 'POST';
 		$environment['REQUEST_URI'] = '/profile/login';
         $environment['CONTENT_TYPE'] = 'multipart/form-data';
-        
+        $environment['SERVER_NAME'] = 'app-travis-debug';
+
 		$_POST['email'] = 'a@a.com';
 		$_POST['password'] = 'admin';
 
@@ -246,7 +254,8 @@ class ProfileTest extends PHPUnit\Framework\TestCase
 		$environment['REQUEST_URI'] = '/profile/change/password';
         $environment['CONTENT_TYPE'] = 'multipart/form-data';
         $environment['HTTP_X_REQUEST_APPTOKEN'] = $token;
-        
+        $environment['SERVER_NAME'] = 'app-travis-debug';
+
 		$_POST['old_pass'] = 'admin';
 		$_POST['new_pass'] = 'admin';
 		$_POST['cnf_pass'] = 'admin';
@@ -271,7 +280,8 @@ class ProfileTest extends PHPUnit\Framework\TestCase
 		$environment['REQUEST_METHOD'] = 'POST';
 		$environment['REQUEST_URI'] = '/profile/login';
         $environment['CONTENT_TYPE'] = 'multipart/form-data';
-        
+        $environment['SERVER_NAME'] = 'app-travis-debug';
+
 		$_POST['email'] = 'a@a.com';
 		$_POST['password'] = 'admin';
 
@@ -293,7 +303,8 @@ class ProfileTest extends PHPUnit\Framework\TestCase
 		$environment['REQUEST_URI'] = '/profile/change/password';
         $environment['CONTENT_TYPE'] = 'multipart/form-data';
         $environment['HTTP_X_REQUEST_APPTOKEN'] = $token;
-        
+        $environment['SERVER_NAME'] = 'app-travis-debug';
+
 		$_POST['old_pass'] = 'admin';
 		$_POST['new_pass'] = 'admin12';
 		$_POST['cnf_pass'] = 'admin123';
@@ -318,7 +329,8 @@ class ProfileTest extends PHPUnit\Framework\TestCase
 		$environment['REQUEST_METHOD'] = 'POST';
 		$environment['REQUEST_URI'] = '/profile/login';
         $environment['CONTENT_TYPE'] = 'multipart/form-data';
-        
+        $environment['SERVER_NAME'] = 'app-travis-debug';
+
 		$_POST['email'] = 'a@a.com';
 		$_POST['password'] = 'admin';
 
@@ -340,7 +352,8 @@ class ProfileTest extends PHPUnit\Framework\TestCase
 		$environment['REQUEST_URI'] = '/profile/change/password';
         $environment['CONTENT_TYPE'] = 'multipart/form-data';
         $environment['HTTP_X_REQUEST_APPTOKEN'] = $token;
-        
+        $environment['SERVER_NAME'] = 'app-travis-debug';
+
 		$_POST['old_pass'] = 'admin12';
 		$_POST['new_pass'] = 'admin';
 		$_POST['cnf_pass'] = 'admin';
@@ -373,6 +386,7 @@ class ProfileTest extends PHPUnit\Framework\TestCase
 		$environment['REQUEST_METHOD'] = 'POST';
 		$environment['REQUEST_URI'] = '/profile/verify';
 		$environment['CONTENT_TYPE'] = 'multipart/form-data';
+        $environment['SERVER_NAME'] = 'app-travis-debug';
 
         $_POST['code'] = $code;
         
@@ -392,6 +406,7 @@ class ProfileTest extends PHPUnit\Framework\TestCase
         $environment['REQUEST_METHOD'] = 'POST';
         $environment['REQUEST_URI'] = '/profile/login';
         $environment['CONTENT_TYPE'] = 'multipart/form-data';
+        $environment['SERVER_NAME'] = 'app-travis-debug';
 
         $_POST['email'] = 'a@a.com';
         $_POST['password'] = 'admin';
@@ -411,7 +426,7 @@ class ProfileTest extends PHPUnit\Framework\TestCase
         $environment['REQUEST_METHOD'] = 'POST';
         $environment['REQUEST_URI'] = '/profile/verify/resend';
         $environment['CONTENT_TYPE'] = 'multipart/form-data';
-
+        $environment['SERVER_NAME'] = 'app-travis-debug';
         $environment['HTTP_X_REQUEST_APPTOKEN'] = $token;
 
         $_POST = [];
@@ -436,6 +451,7 @@ class ProfileTest extends PHPUnit\Framework\TestCase
         $environment['REQUEST_METHOD'] = 'POST';
         $environment['REQUEST_URI'] = '/profile/verify';
         $environment['CONTENT_TYPE'] = 'multipart/form-data';
+        $environment['SERVER_NAME'] = 'app-travis-debug';
 
         $_POST['code'] = 'not-found-code';
         
@@ -458,6 +474,7 @@ class ProfileTest extends PHPUnit\Framework\TestCase
         $environment['REQUEST_METHOD'] = 'POST';
         $environment['REQUEST_URI'] = '/profile/create';
         $environment['CONTENT_TYPE'] = 'multipart/form-data';
+        $environment['SERVER_NAME'] = 'app-travis-debug';
 
         $_POST['name'] = 'Administrador';
         $_POST['gender'] = 'O';
@@ -484,6 +501,7 @@ class ProfileTest extends PHPUnit\Framework\TestCase
         $environment['REQUEST_METHOD'] = 'POST';
         $environment['REQUEST_URI'] = '/profile/create';
         $environment['CONTENT_TYPE'] = 'multipart/form-data';
+        $environment['SERVER_NAME'] = 'app-travis-debug';
 
         $_POST['name'] = 'Administrador';
         $_POST['gender'] = 'O';
@@ -508,6 +526,7 @@ class ProfileTest extends PHPUnit\Framework\TestCase
         $environment['REQUEST_METHOD'] = 'POST';
         $environment['REQUEST_URI'] = '/profile/login';
         $environment['CONTENT_TYPE'] = 'multipart/form-data';
+        $environment['SERVER_NAME'] = 'app-travis-debug';
 
         $_POST['email'] = 'b@b.com';
         $_POST['password'] = 'admin';
@@ -529,6 +548,7 @@ class ProfileTest extends PHPUnit\Framework\TestCase
         $environment['REQUEST_METHOD'] = 'POST';
         $environment['REQUEST_URI'] = '/profile/verify/resend';
         $environment['CONTENT_TYPE'] = 'multipart/form-data';
+        $environment['SERVER_NAME'] = 'app-travis-debug';
 
         $environment['HTTP_X_REQUEST_APPTOKEN'] = $token;
 
@@ -559,7 +579,7 @@ class ProfileTest extends PHPUnit\Framework\TestCase
         $environment['REQUEST_METHOD'] = 'POST';
         $environment['REQUEST_URI'] = '/profile/verify/resend';
         $environment['CONTENT_TYPE'] = 'multipart/form-data';
-
+        $environment['SERVER_NAME'] = 'app-travis-debug';
         $environment['HTTP_X_REQUEST_APPTOKEN'] = $token;
 
         $_POST = [];
@@ -585,6 +605,7 @@ class ProfileTest extends PHPUnit\Framework\TestCase
         $environment['REQUEST_METHOD'] = 'POST';
         $environment['REQUEST_URI'] = '/profile/create';
         $environment['CONTENT_TYPE'] = 'multipart/form-data';
+        $environment['SERVER_NAME'] = 'app-travis-debug';
 
         $_POST['name'] = 'Administrador';
         $_POST['gender'] = 'F';
@@ -608,6 +629,7 @@ class ProfileTest extends PHPUnit\Framework\TestCase
         $environment['REQUEST_METHOD'] = 'POST';
         $environment['REQUEST_URI'] = '/profile/reset';
         $environment['CONTENT_TYPE'] = 'multipart/form-data';
+        $environment['SERVER_NAME'] = 'app-travis-debug';
 
         $_POST['email'] = 'c@c.com';
 
@@ -628,6 +650,7 @@ class ProfileTest extends PHPUnit\Framework\TestCase
         $environment['REQUEST_METHOD'] = 'POST';
         $environment['REQUEST_URI'] = '/profile/reset';
         $environment['CONTENT_TYPE'] = 'multipart/form-data';
+        $environment['SERVER_NAME'] = 'app-travis-debug';
 
         $_POST['email'] = 'c@c.com';
 
@@ -657,6 +680,7 @@ class ProfileTest extends PHPUnit\Framework\TestCase
         $environment['REQUEST_METHOD'] = 'POST';
         $environment['REQUEST_URI'] = '/profile/reset/confirm';
         $environment['CONTENT_TYPE'] = 'multipart/form-data';
+        $environment['SERVER_NAME'] = 'app-travis-debug';
 
         $_POST['code'] = $code;
 
@@ -681,6 +705,7 @@ class ProfileTest extends PHPUnit\Framework\TestCase
         $environment['REQUEST_METHOD'] = 'POST';
         $environment['REQUEST_URI'] = '/profile/reset';
         $environment['CONTENT_TYPE'] = 'multipart/form-data';
+        $environment['SERVER_NAME'] = 'app-travis-debug';
 
         $_POST['email'] = 'x@x.com';
 
@@ -705,6 +730,7 @@ class ProfileTest extends PHPUnit\Framework\TestCase
         $environment['REQUEST_METHOD'] = 'POST';
         $environment['REQUEST_URI'] = '/profile/reset/confirm';
         $environment['CONTENT_TYPE'] = 'multipart/form-data';
+        $environment['SERVER_NAME'] = 'app-travis-debug';
 
         $_POST['code'] = 'this-is-not-a-code';
 

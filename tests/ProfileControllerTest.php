@@ -78,6 +78,7 @@ class ProfileControllerTest extends PHPUnit\Framework\TestCase
 		$environment['REQUEST_METHOD'] = 'POST';
 		$environment['REQUEST_URI'] = '/profile/login';
 		$environment['CONTENT_TYPE'] = 'multipart/form-data';
+		$environment['SERVER_NAME'] = 'app-travis-debug';
 
 		$_POST['email'] = 'a@a.com';
 		$_POST['password'] = 'admin';
@@ -100,6 +101,7 @@ class ProfileControllerTest extends PHPUnit\Framework\TestCase
 		$environment['REQUEST_METHOD'] = 'POST';
 		$environment['REQUEST_URI'] = '/profile/login';
 		$environment['CONTENT_TYPE'] = 'multipart/form-data';
+		$environment['SERVER_NAME'] = 'app-travis-debug';
 
 		$_POST['email'] = 'a@a.com';
 		$_POST['password'] = 'error-password';
@@ -122,6 +124,7 @@ class ProfileControllerTest extends PHPUnit\Framework\TestCase
 		$environment['REQUEST_METHOD'] = 'POST';
 		$environment['REQUEST_URI'] = '/profile/login';
 		$environment['CONTENT_TYPE'] = 'multipart/form-data';
+		$environment['SERVER_NAME'] = 'app-travis-debug';
 
 		$_POST['email'] = 'a@a.com';
 		$_POST['password'] = 'admin';
@@ -137,6 +140,7 @@ class ProfileControllerTest extends PHPUnit\Framework\TestCase
         // Ambiente padrão para execução do URI.
 		$environment['REQUEST_METHOD'] = 'GET';
 		$environment['REQUEST_URI'] = '/home/index';
+		$environment['SERVER_NAME'] = 'app-travis-debug';
 		unset($environment['CONTENT_TYPE']);
 		unset($_POST);
 
@@ -159,6 +163,7 @@ class ProfileControllerTest extends PHPUnit\Framework\TestCase
 		$environment['REQUEST_METHOD'] = 'POST';
 		$environment['REQUEST_URI'] = '/profile/login';
 		$environment['CONTENT_TYPE'] = 'multipart/form-data';
+		$environment['SERVER_NAME'] = 'app-travis-debug';
 
 		$_POST['email'] = 'a@a.com';
 		$_POST['password'] = 'admin';
@@ -199,6 +204,7 @@ class ProfileControllerTest extends PHPUnit\Framework\TestCase
         // Ambiente padrão para execução do URI.
 		$environment['REQUEST_METHOD'] = 'GET';
 		$environment['REQUEST_URI'] = '/home/index';
+		$environment['SERVER_NAME'] = 'app-travis-debug';
 
 		$userToken = md5($jsonToken->token);
 		$environment['HTTP_X_REQUEST_APPTOKEN'] = $userToken;
@@ -221,6 +227,7 @@ class ProfileControllerTest extends PHPUnit\Framework\TestCase
 		$environment['REQUEST_METHOD'] = 'POST';
 		$environment['REQUEST_URI'] = '/profile/login';
 		$environment['CONTENT_TYPE'] = 'multipart/form-data';
+		$environment['SERVER_NAME'] = 'app-travis-debug';
 
 		$_POST['email'] = 'a@a.com';
 		$_POST['password'] = 'admin';
@@ -261,6 +268,7 @@ class ProfileControllerTest extends PHPUnit\Framework\TestCase
         // Ambiente padrão para execução do URI.
 		$environment['REQUEST_METHOD'] = 'GET';
 		$environment['REQUEST_URI'] = '/home/index';
+		$environment['SERVER_NAME'] = 'app-travis-debug';
 
 		$userToken = $jsonToken->token;
 		$environment['HTTP_X_REQUEST_APPTOKEN'] = $userToken;
@@ -293,6 +301,7 @@ class ProfileControllerTest extends PHPUnit\Framework\TestCase
 		$environment['REQUEST_METHOD'] = 'POST';
 		$environment['REQUEST_URI'] = '/profile/login';
 		$environment['CONTENT_TYPE'] = 'multipart/form-data';
+		$environment['SERVER_NAME'] = 'app-travis-debug';
 
 		$_POST['email'] = 'a@a.com';
 		$_POST['password'] = 'admin';
@@ -333,6 +342,7 @@ class ProfileControllerTest extends PHPUnit\Framework\TestCase
         // Ambiente padrão para execução do URI.
 		$environment['REQUEST_METHOD'] = 'GET';
 		$environment['REQUEST_URI'] = '/home/index';
+		$environment['SERVER_NAME'] = 'app-travis-debug';
 
 		$userToken = $jsonToken->token;
 		$environment['HTTP_X_REQUEST_APPTOKEN'] = $userToken;

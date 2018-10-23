@@ -1,4 +1,7 @@
 {
+    "server" : {
+        "name" : "RagnaService"
+    },
     "connections": {
         "default": {
             "data": {
@@ -12,6 +15,15 @@
                 "prefix": ""
             }
         }
+    },
+    "mailer" : {
+        "host" : "127.0.0.1",
+        "port" : 2525,
+        "encrypt" : "",
+        "user" : "ragnaservice@ragnaservice.com.br",
+        "pass" : "ragnaservice",
+        "from" : "ragnaservice@ragnaservice.com.br",
+        "name" : "RagnaService"
     },
     "language":"pt_BR",
     "profile" : {

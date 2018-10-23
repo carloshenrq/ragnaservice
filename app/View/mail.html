@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<style>
+			{block name="MAILER_CSS_FULL"}
+				html, body {
+					padding: 0; margin: 0;
+					font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
+					font-size: 1em;
+				}
+
+				.mail-header, .mail-footer, .mail-body {
+					padding: .4em;
+				}
+				.mail-header {
+					background-color: rgba(22, 160, 133,1.0);
+					color: white;
+				}
+
+				.mail-footer {
+					background-color: rgba(26, 188, 156,1.0);
+					color: white;
+					font-size: .7em;
+				}
+
+				.mail-body {
+					background-color: rgba(250, 250, 250,1.0);
+					color: rgba(22, 160, 133,1.0);
+					font-size: 1.2em;
+				}
+
+				.mail-body p {
+					margin: 0; padding: 0;
+					display: block;
+				}
+
+				.mail-code {
+					padding: 1em;
+					margin: 1em;
+					background-color: rgba(22, 160, 133,1.0);
+					color: white;
+					text-align: center;
+					font-weight: bold;
+					letter-spacing: .1em;
+					font-family: monospace;
+					font-size: 1.2em;
+				}
+
+				{block name="MAILER_CSS"}{/block}
+			{/block}
+		</style>
+	</head>
+	<body>
+		<div class="mail-header">
+		{block name="MAIL_HEADER"}
+			{sprintf(__t('Olá <strong>%s</strong>!'), $profile->name)}
+		{/block}
+		</div>
+
+		<div class="mail-body">{block name="MAIL_BODY"}{/block}</div>
+
+		<div class="mail-footer">{block name="MAIL_FOOTER"}
+				{sprintf(__t('Este e-mail foi enviado para <u><i>%s</i></u> às <u><i>%s</i></u> por <u><i>%s</i></u>.'), $profile->email,
+					$now->format('Y-m-d H:i:s'),
+					$config->server->name)}<br>
+				{__t('Caso este e-mail tenha sido enviado de forma incorreta, por favor, desconsidere.')}
+		{/block}</div>
+	</body>
+
+</html>
+

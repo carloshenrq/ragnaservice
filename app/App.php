@@ -71,12 +71,19 @@ class App extends CHZApp\Application
             'config.json'
         ]));
 
+        // Inicializa informações do slim com opções padrões de diretório...
+        $this->setSmartyConfigs([
+            'templateDir'   => join(DIRECTORY_SEPARATOR, [__DIR__, 'View']),
+        ]);
+
+
         // Se conseguiu fazer a leitura dos dados
         // então estará tudo OK para não permitir
         // o módo de instalação.
         if ($configFile !== false && file_exists($configFile)) {
             $configContent = file_get_contents($configFile);
             $config = json_decode($configContent);
+
 
             if (is_null($config))
                 throw new Exception(__t("Falha na leitura do arquivo de configuração."));
@@ -86,6 +93,10 @@ class App extends CHZApp\Application
 
             // Identifica que não está em modo de instalação
             $this->setInstallMode(false);
+
+            // Define informações de envio de email...
+            if (isset($config->mailer) && !is_null($config->mailer))
+                $this->setMailerConfigs((array)$config->mailer);
 
             // Define os dados de conexão com o BD.
             $this->setEloquentConfigs($config->connections);

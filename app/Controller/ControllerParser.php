@@ -24,6 +24,7 @@ use \Psr\Http\Message\ServerRequestInterface;
 use \Psr\Http\Message\ResponseInterface;
 
 use \Model\TokenProfile as Model_TokenProfile;
+use \App as Application;
 
 abstract class ControllerParser extends CHZApp_Controller
 {
@@ -84,4 +85,19 @@ abstract class ControllerParser extends CHZApp_Controller
 
         return parent::__router($request, $response, $args);
     }
+
+    /**
+     * Envia o e-mail com as informações passadas.
+     */
+    public static function sendMail($subject, $to, $template, $data = array(), $type = 'text/html', $attach = array())
+    {
+        $app = Application::getInstance();
+        $app->getMailer()->sendFromTemplate($subject, $to, $template, array_merge($data, [
+            'config' => $app->getConfig()
+        ]), $type, $attach);
+
+        if (getenv('TRAVIS_CI_DEBUG') !== false && getenv('TRAVIS_CI_DEBUG') == 1)
+            sleep(1);
+    }
+
 }
