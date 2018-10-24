@@ -21,26 +21,23 @@ namespace Model;
 
 use \Illuminate\Database\Eloquent\Model as Eloquent_Model;
 
-class ServerLogin extends Eloquent_Model
+class ProfileAccount extends Eloquent_Model
 {
-	/**
-	 * Obtém todos os char-servers referentes ao login
-	 */
-	public function charServers()
+	public function profile()
 	{
-		return $this->hasMany('\Model\ServerChar', 'login_id', 'id');
+        return $this->belongsTo('\Model\Profile', 'profile_id', 'id');
 	}
 
-    public function accounts()
-    {
-        return $this->hasMany('\Model\ProfileAccount', 'login_id', 'id');
-    }
+	public function loginServer()
+	{
+		return $this->belongsTo('\Model\ServerLogin', 'login_id', 'id');
+	}
 
-    protected $table = 'server_login';
+    protected $table = 'profile_account';
     protected $connection = 'default';
 
     protected $fillable = [
-        'name', 'address', 'port', 'status', 'next_check'
+        'login_id', 'profile_id', 'account_id', 'userid', 'group_id', 'state'
     ];
 
     protected $dates = [
@@ -48,8 +45,11 @@ class ServerLogin extends Eloquent_Model
     ];
 
     protected $casts = [
-        'port' => 'integer',
-        'status' => 'boolean',
-        'next_check' => 'integer'
+        'login_id' => 'integer',
+        'profile_id' => 'integer',
+        'account_id' => 'integer',
+        'group_id' => 'integer',
+        'state' => 'integer',
     ];
 }
+

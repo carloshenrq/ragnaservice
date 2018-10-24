@@ -39,6 +39,11 @@ class Profile extends Eloquent_Model
         return $this->hasMany('\Model\ProfileReset', 'profile_id', 'id');
     }
 
+    public function accounts()
+    {
+        return $this->hasMany('\Model\ProfileAccount', 'login_id', 'id');
+    }
+
     /**
      * Faz alterações de informações padrões do perfil
      * do usuários

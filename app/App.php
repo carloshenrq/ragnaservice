@@ -249,6 +249,25 @@ class App extends CHZApp\Application
             });
         }
 
+        if (!$schema->hasTable('profile_account')) {
+            $schema->create('profile_account', function($table) {
+                $table->engine = 'InnoDB';
+                $table->increments('id');
+                $table->integer('login_id')->unsigned();
+                $table->integer('profile_id')->unsigned();
+                $table->integer('account_id');
+                $table->string('userid', 60);
+                $table->integer('group_id')->default(0);
+                $table->integer('state')->default(0);
+                $table->timestamps();
+
+                $table->foreign('login_id')->references('id')->on('server_login');
+                $table->foreign('profile_id')->references('id')->on('profile');
+
+                $table->unique(['login_id', 'account_id']);
+            });
+        }
+
         if (!$profileCreated) {
             Model_Profile::create([
                 'name' => 'Administrador',
