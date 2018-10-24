@@ -4,12 +4,19 @@ php:
   - 7.0
   - 7.1
   - 7.2
+
+branches:
+  only:
+  - master
+
 services:
     - memcached
     - mysql
+
 cache:
     directories:
       - "$HOME/.composer/cache"
+
 before_install:
   - sudo apt-get -y update
   - sudo apt-get -y install apache2 libapache2-mod-fastcgi
@@ -38,7 +45,9 @@ before_install:
   - mysql -uragnarok -pragnarok ragnarok < tmp/sql-files/main.sql
   - mysql -uragnarok -pragnarok ragnarok < tmp/sql-files/logs.sql
   - rm -rf tmp
+
 script:
   - vendor/bin/phpunit --coverage-clover=coverage.xml
+
 after_success:
   - bash <(curl -s https://codecov.io/bash)
