@@ -1,6 +1,19 @@
 {
     "server" : {
-        "name" : "RagnaService"
+        "name" : "RagnaService",
+        "checkDelay" : 60,
+        "login" : [{
+            "name" : "RagnaService",
+            "address" : "127.0.0.1",
+            "port" : 6900,
+            "charServer" : [{
+                "name" : "Ragnarok",
+                "charAddress" : "127.0.0.1",
+                "charPort" : 6121,
+                "mapAddress" : "127.0.0.1",
+                "mapPort" : 5121
+            }]
+        }]
     },
     "connections": {
         "default": {
@@ -15,6 +28,10 @@
                 "prefix": ""
             }
         }
+    },
+    "memcached" : {
+        "host" : "127.0.0.1",
+        "port" : 11211
     },
     "mailer" : {
         "host" : "127.0.0.1",

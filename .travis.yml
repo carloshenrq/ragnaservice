@@ -21,6 +21,9 @@ before_install:
   - mysql -e "CREATE USER 'ragnaservice'@'localhost' IDENTIFIED BY 'ragnaservice';"
   - mysql -e "CREATE DATABASE ragnaservice;"
   - mysql -e "GRANT ALL PRIVILEGES ON ragnaservice.* TO 'ragnaservice'@'localhost';"
+  - mysql -e "CREATE USER 'ragnarok'@'localhost' IDENTIFIED BY 'ragnarok';"
+  - mysql -e "CREATE DATABASE ragnarok;"
+  - mysql -e "GRANT ALL PRIVILEGES ON ragnarok.* TO 'ragnarok'@'localhost';"
   - sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf
   - sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/www.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/www.conf 2>/dev/null || true
   - sudo a2enmod rewrite actions fastcgi alias
@@ -31,6 +34,10 @@ before_install:
   - sudo cp -f build/travis-ci-apache /etc/apache2/sites-available/000-default.conf
   - sudo sed -e "s?%TRAVIS_BUILD_DIR%?$(pwd)?g" --in-place /etc/apache2/sites-available/000-default.conf
   - sudo service apache2 restart
+  - git clone https://github.com/HerculesWS/Hercules.git tmp
+  - mysql -uragnarok -pragnarok ragnarok < tmp/sql-files/main.sql
+  - mysql -uragnarok -pragnarok ragnarok < tmp/sql-files/logs.sql
+  - rm -rf tmp
 script:
   - vendor/bin/phpunit --coverage-clover=coverage.xml
 after_success:

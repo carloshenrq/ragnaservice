@@ -19,6 +19,8 @@
 
 use Model\Token as Model_Token;
 use Model\Profile as Model_Profile;
+use Model\ServerLogin as Model_ServerLogin;
+use Model\ServerChar as Model_ServerChar;
 
 class App extends CHZApp\Application
 {
@@ -102,6 +104,7 @@ class App extends CHZApp\Application
             $this->setEloquentConfigs($config->connections);
             $this->registerModels();
             $this->loadLanguage();
+            $this->parseServers();
         }
     }
 
@@ -208,6 +211,41 @@ class App extends CHZApp\Application
                 $table->timestamps();
 
                 $table->foreign('profile_id')->references('id')->on('profile');
+            });
+        }
+
+        if (!$schema->hasTable('server_login')) {
+            $schema->create('server_login', function($table) {
+                $table->engine = 'InnoDB';
+                $table->increments('id');
+                $table->string('name', 30)->nullable();
+                $table->string('address', 20)->default('127.0.0.1');
+                $table->integer('port')->default(6900);
+                $table->boolean('status')->default(false);
+                $table->integer('next_check')->unsigned();
+                $table->timestamps();
+
+                $table->unique(['address', 'port']);
+            });
+        }
+
+        if (!$schema->hasTable('server_char')) {
+            $schema->create('server_char', function($table) {
+                $table->engine = 'InnoDB';
+                $table->increments('id');
+                $table->integer('login_id')->unsigned();
+                $table->string('name', 30);
+                $table->string('char_address', 20)->default('127.0.0.1');
+                $table->integer('char_port')->default(6121);
+                $table->boolean('char_status')->default(false);
+                $table->string('map_address', 20)->default('127.0.0.1');
+                $table->integer('map_port')->default(5121);
+                $table->boolean('map_status')->default(false);
+                $table->integer('next_check')->unsigned();
+                $table->timestamps();
+
+                $table->unique(['login_id', 'name']);
+                $table->foreign('login_id')->references('id')->on('server_login');
             });
         }
 
@@ -362,6 +400,50 @@ class App extends CHZApp\Application
             $modelClass = '\\Model\\' . substr($fileModel->getFilename(), 0, -4);
             call_user_func([$modelClass, 'flushEventListeners']);
             call_user_func([$modelClass, 'boot']);
+        }
+    }
+
+    /**
+     * Realiza o tratamento de gravar os dados de servidor direto no banco de dados.
+     */
+    public function parseServers()
+    {
+        foreach ($this->getConfig()->server->login as $login) {
+            $l = Model_ServerLogin::where([
+                'address' => $login->address,
+                'port' => $login->port,
+            ])->first();
+
+            if (is_null($l)) {
+                // Cria a entrada do servidor...
+                $l = Model_ServerLogin::create([
+                    'name' => $login->name,
+                    'address' => $login->address,
+                    'port' => $login->port,
+                    'status' => false,
+                    'next_check' => 0
+                ]);
+            }
+
+            foreach ($login->charServer as $char) {
+                $c = $l->charServers->first(function($charServer) use ($char) {
+                    return $charServer->name == $char->name;
+                });
+
+                if (is_null($c)) {
+                    Model_ServerChar::create([
+                        'login_id' => $l->id,
+                        'name' => $char->name,
+                        'char_address' => $char->charAddress,
+                        'char_port' => $char->charPort,
+                        'char_status' => false,
+                        'map_address' => $char->mapAddress,
+                        'map_port' => $char->mapPort,
+                        'map_status' => false,
+                        'next_check' => 0
+                    ]);
+                }
+            }
         }
     }
 

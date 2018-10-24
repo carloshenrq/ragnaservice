@@ -1,7 +1,7 @@
 build: false
 clone_depth: 1
 clone_folder: c:\projects\ragnaservice
-
+image: Visual Studio 2015
 configuration:
 - php56
 - php70
@@ -49,6 +49,8 @@ install:
     - cd c:\Apache24\bin
     - httpd -k install -n "Apache24"
     - net start Apache24
+    - cd \
+    - git clone https://github.com/HerculesWS/Hercules.git tmp
 
 before_test:
     - ruby -v
@@ -58,6 +60,11 @@ before_test:
     - mysql -e "CREATE USER 'ragnaservice'@'localhost' IDENTIFIED BY 'ragnaservice';" --user=root
     - mysql -e "CREATE DATABASE ragnaservice;" --user=root
     - mysql -e "GRANT ALL PRIVILEGES ON ragnaservice.* TO 'ragnaservice'@'localhost';" --user=root
+    - mysql -e "CREATE USER 'ragnarok'@'localhost' IDENTIFIED BY 'ragnarok';" --user=root
+    - mysql -e "CREATE DATABASE ragnarok;" --user=root
+    - mysql -e "GRANT ALL PRIVILEGES ON ragnarok.* TO 'ragnarok'@'localhost';" --user=root
+    - mysql -uragnarok -pragnarok ragnarok < c:/tmp/sql-files/main.sql
+    - mysql -uragnarok -pragnarok ragnarok < c:/tmp/sql-files/logs.sql
 
 test_script:
     - cd c:\projects\ragnaservice
