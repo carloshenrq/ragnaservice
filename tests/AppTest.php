@@ -19,6 +19,9 @@
 
 require_once 'app/autoload.php';
 
+use \Model\Profile as Model_Profile;
+use \Model\ProfileAccount as Model_ProfileAccount;
+
 class AppTest extends PHPUnit\Framework\TestCase
 {
 	public function setUp()
@@ -73,6 +76,24 @@ class AppTest extends PHPUnit\Framework\TestCase
 
 		$charConn = $app->getCharServerConnection($loginServer, 'ragnarok');
 		$this->assertEquals('char-ragnaservice-ragnarok', $charConn);
+
+		/** Testes para vinculo entre contas do jogo e de perfil **/
+		$account = Model_ProfileAccount::create([
+			'login_id' => 1,
+			'profile_id' => 1,
+			'account_id' => 2000000,
+			'userid' => 'admin',
+			'group_id' => 99,
+			'state' => 0
+		]);
+
+		$this->assertNotNull($account->loginServer);
+		$this->assertEquals('RagnaService', $account->loginServer->name);
+		$this->assertNotNull($account->profile);
+		$this->assertEquals(1, $account->profile->id);
+
+		$profile = Model_Profile::find(1);
+		$this->assertEquals(1, $profile->accounts->count());
 	}
 
 	/**

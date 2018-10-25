@@ -107,6 +107,7 @@ class Server extends ControllerParser
             return [
                 'name' => $login->name,
                 'next_check' => $login->next_check,
+                'account_count' => $login->accounts->count(),
                 'status' => [
                     'login' => $login->status,
                     'chars' => $login->charServers->map(function($char) {
