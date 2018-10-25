@@ -23,13 +23,13 @@ use \Illuminate\Database\Eloquent\Model as Eloquent_Model;
 
 class ServerChar extends Eloquent_Model
 {
-	/**
-	 * Obtém o login-server relacionado a este char-server.
-	 */
-	public function loginServer()
-	{
-		return $this->belongsTo('\Model\ServerLogin', 'login_id', 'id');
-	}
+    /**
+     * Obtém o login-server relacionado a este char-server.
+     */
+    public function loginServer()
+    {
+        return $this->belongsTo('\Model\ServerLogin', 'login_id', 'id');
+    }
 
     protected $table = 'server_char';
     protected $connection = 'default';

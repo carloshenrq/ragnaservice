@@ -23,15 +23,15 @@ use \Illuminate\Database\Eloquent\Model as Eloquent_Model;
 
 class ProfileAccount extends Eloquent_Model
 {
-	public function profile()
-	{
+    public function profile()
+    {
         return $this->belongsTo('\Model\Profile', 'profile_id', 'id');
-	}
+    }
 
-	public function loginServer()
-	{
-		return $this->belongsTo('\Model\ServerLogin', 'login_id', 'id');
-	}
+    public function loginServer()
+    {
+        return $this->belongsTo('\Model\ServerLogin', 'login_id', 'id');
+    }
 
     protected $table = 'profile_account';
     protected $connection = 'default';

@@ -24,103 +24,103 @@ use \Model\ServerChar as Model_ServerChar;
 
 class Server extends ControllerParser
 {
-	public function init()
-	{
-		$this->addRouteRegexp('/^\/server\/status\/char\/([a-zA-Z0-9]+)$/i', '/server/status/char/{name}');
-	}
+    public function init()
+    {
+        $this->addRouteRegexp('/^\/server\/status\/char\/([a-zA-Z0-9]+)$/i', '/server/status/char/{name}');
+    }
 
-	/**
-	 * Status de servidor de personagem solicitado.
-	 */
-	public function status_char_GET($response, $args)
-	{
-		// Dados de retorno
-		$data = [
-			'name' => $args['name'],
-			'login' => false,
-			'char' => false,
-			'map' => false
-		];
+    /**
+     * Status de servidor de personagem solicitado.
+     */
+    public function status_char_GET($response, $args)
+    {
+        // Dados de retorno
+        $data = [
+            'name' => $args['name'],
+            'login' => false,
+            'char' => false,
+            'map' => false
+        ];
 
-		$charServer = Model_ServerChar::where([
-			'name' => $data['name']
-		])->first();
+        $charServer = Model_ServerChar::where([
+            'name' => $data['name']
+        ])->first();
 
 
-		if (!is_null($charServer)) {
-			$data = array_merge($data, [
-				'login' => $charServer->loginServer->status,
-				'char' => $charServer->char_status,
-				'map' => $charServer->map_status,
-			]);
-		}
+        if (!is_null($charServer)) {
+            $data = array_merge($data, [
+                'login' => $charServer->loginServer->status,
+                'char' => $charServer->char_status,
+                'map' => $charServer->map_status,
+            ]);
+        }
 
-		return $response->withJson($data);
-	}
+        return $response->withJson($data);
+    }
 
-	/**
-	 * Status de servidor retorna a rota padrão.
-	 */
-	public function status_GET($response, $args)
-	{
-		return $this->index_GET($response, $args);
-	}
+    /**
+     * Status de servidor retorna a rota padrão.
+     */
+    public function status_GET($response, $args)
+    {
+        return $this->index_GET($response, $args);
+    }
 
-	/**
-	 * Verifica os dados de status dos servidores caso necessário.
-	 */
-	public function index_GET($response, $args)
-	{
-		// Faz teste de verificação para próxima verificação.
-		$next_check = time() + $this->getConfig()->server->checkDelay;
+    /**
+     * Verifica os dados de status dos servidores caso necessário.
+     */
+    public function index_GET($response, $args)
+    {
+        // Faz teste de verificação para próxima verificação.
+        $next_check = time() + $this->getConfig()->server->checkDelay;
 
-		// Obtém os status dos servidores para fazer a exibição dos status.
-		$status = Model_ServerLogin::all()->each(function($login) use ($next_check) {
-			// Tenta efetuar o ping na porta de login...
-			$errno = $errstr = '';
+        // Obtém os status dos servidores para fazer a exibição dos status.
+        $status = Model_ServerLogin::all()->each(function($login) use ($next_check) {
+            // Tenta efetuar o ping na porta de login...
+            $errno = $errstr = '';
 
-			if ($login->next_check < time()) {
-				$status = @fsockopen($login->address, $login->port, $errno, $errstr, 5);
-				$login->status = is_resource($status);
-				$login->next_check = $next_check;
-				$login->save();
-				if ($status) fclose($status);
-			}
+            if ($login->next_check < time()) {
+                $status = @fsockopen($login->address, $login->port, $errno, $errstr, 5);
+                $login->status = is_resource($status);
+                $login->next_check = $next_check;
+                $login->save();
+                if ($status) fclose($status);
+            }
 
-			// Varre os char-severs para verificar o status de conexão
-			$login->charServers->each(function($char) use ($next_check) {
-				$errno = $errstr = '';
-				if ($char->next_check < time()) {
-					$c_status = @fsockopen($char->char_address, $char->char_port, $errno, $errstr, 5);
-					$m_status = @fsockopen($char->map_address, $char->map_port, $errno, $errstr, 5);
-					$char->char_status = is_resource($c_status);
-					$char->map_status = is_resource($m_status);
-					$char->next_check = $next_check;
-					$char->save();
-					if ($c_status) fclose($c_status);
-					if ($m_status) fclose($m_status);
-				}
-			});
+            // Varre os char-severs para verificar o status de conexão
+            $login->charServers->each(function($char) use ($next_check) {
+                $errno = $errstr = '';
+                if ($char->next_check < time()) {
+                    $c_status = @fsockopen($char->char_address, $char->char_port, $errno, $errstr, 5);
+                    $m_status = @fsockopen($char->map_address, $char->map_port, $errno, $errstr, 5);
+                    $char->char_status = is_resource($c_status);
+                    $char->map_status = is_resource($m_status);
+                    $char->next_check = $next_check;
+                    $char->save();
+                    if ($c_status) fclose($c_status);
+                    if ($m_status) fclose($m_status);
+                }
+            });
 
-		})->map(function($login) {
-			$login->refresh();
-			return [
-				'name' => $login->name,
-				'next_check' => $login->next_check,
-				'status' => [
-					'login' => $login->status,
-					'chars' => $login->charServers->map(function($char) {
-						return [
-							'name' => $char->name,
-							'char' => $char->char_status,
-							'map' => $char->map_status,
-						];
-					})
-				]
-			];
-		});
+        })->map(function($login) {
+            $login->refresh();
+            return [
+                'name' => $login->name,
+                'next_check' => $login->next_check,
+                'status' => [
+                    'login' => $login->status,
+                    'chars' => $login->charServers->map(function($char) {
+                        return [
+                            'name' => $char->name,
+                            'char' => $char->char_status,
+                            'map' => $char->map_status,
+                        ];
+                    })
+                ]
+            ];
+        });
 
-		// Responde com o status do servidor...
-		return $response->withJson($status);
-	}
+        // Responde com o status do servidor...
+        return $response->withJson($status);
+    }
 }

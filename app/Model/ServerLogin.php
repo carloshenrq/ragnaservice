@@ -23,13 +23,13 @@ use \Illuminate\Database\Eloquent\Model as Eloquent_Model;
 
 class ServerLogin extends Eloquent_Model
 {
-	/**
-	 * Obtém todos os char-servers referentes ao login
-	 */
-	public function charServers()
-	{
-		return $this->hasMany('\Model\ServerChar', 'login_id', 'id');
-	}
+    /**
+     * Obtém todos os char-servers referentes ao login
+     */
+    public function charServers()
+    {
+        return $this->hasMany('\Model\ServerChar', 'login_id', 'id');
+    }
 
     public function accounts()
     {
