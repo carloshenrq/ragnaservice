@@ -54,6 +54,25 @@ class AppTest extends PHPUnit\Framework\TestCase
 					->enableProxyingToOriginalMethods()
 					->setMethods(['getException'])
 					->getMock();
+
+		/** TESTES DE MÉTODOS DE OBTER A CONEXÃO REFERENTE AO LOGIN/CHAR QUE IRÃO SE CONECTAR **/
+		$loginServer = $app->getFirstLoginServer();
+		$this->assertEquals('ragnaservice', $loginServer);
+
+		$charNull $app->getAllCharServersFromLogin('null-login');
+		$this->assertNull($charNull);
+
+		$charServers = $app->getAllCharServersFromLogin($loginServer);
+		$this->assertEquals(1, count($charServers));
+
+		$charConnNull0 = $app->getCharServerConnection('null-login', 'null-char');
+		$this->assertNull($charConnNull0);
+
+		$charConnNull1 = $app->getCharServerConnection($loginServer, 'null-char');
+		$this->assertNull($charConnNull1);
+
+		$charConn = $app->getCharServerConnection($loginServer, 'ragnarok');
+		$this->assertEquals('char-ragnaservice-ragnarok', $charConn);
 	}
 
 	/**
