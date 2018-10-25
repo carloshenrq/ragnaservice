@@ -59,7 +59,7 @@ class AppTest extends PHPUnit\Framework\TestCase
 		$loginServer = $app->getFirstLoginServer();
 		$this->assertEquals('ragnaservice', $loginServer);
 
-		$charNull $app->getAllCharServersFromLogin('null-login');
+		$charNull = $app->getAllCharServersFromLogin('null-login');
 		$this->assertNull($charNull);
 
 		$charServers = $app->getAllCharServersFromLogin($loginServer);
