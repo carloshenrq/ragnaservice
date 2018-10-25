@@ -27,6 +27,30 @@
                 "collation": "utf8_swedish_ci",
                 "prefix": ""
             }
+        },
+        "login-ragnaservice": {
+            "data": {
+                "driver": "mysql",
+                "host": "127.0.0.1",
+                "database": "ragnarok", 
+                "username": "ragnarok", 
+                "password": "ragnarok", 
+                "charset": "utf8",
+                "collation": "utf8_swedish_ci",
+                "prefix": ""
+            }
+        },
+        "char-ragnaservice-ragnarok": {
+            "data": {
+                "driver": "mysql",
+                "host": "127.0.0.1",
+                "database": "ragnarok", 
+                "username": "ragnarok", 
+                "password": "ragnarok", 
+                "charset": "utf8",
+                "collation": "utf8_swedish_ci",
+                "prefix": ""
+            }
         }
     },
     "memcached" : {

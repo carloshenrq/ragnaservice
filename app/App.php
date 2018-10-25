@@ -60,6 +60,15 @@ class App extends CHZApp\Application
      */
     private $langTranslate;
 
+    /**
+     * Todas as conexões com os logins servers.
+     * @var array
+     */
+    private $loginConnections;
+
+    /**
+     * Método inicializador...
+     */
     public function init()
     {
         // Define a aplicação em modo de instalação.
@@ -105,7 +114,114 @@ class App extends CHZApp\Application
             $this->registerModels();
             $this->loadLanguage();
             $this->parseServers();
+
+            // Verifica todas as conexões, pelas chaves e atribui a mesma em vetores
+            // para os perfils saberem quais conexões irão usar...
+            $conn = array_keys((array)$config->connections);
+
+            // Faz primeiro o tratamento de todas as conexões com os logins 
+            foreach($conn as $name) {
+                if (preg_match('/^login\-(.*)/i', $name, $match)) {
+                    $this->loginConnections[$match[1]] = (object)[
+                        'name' => $name,
+                        'chars' => []
+                    ];
+                }
+            }
+
+            // Agora, faz o tratamento de todas as conexões de char-server...
+            foreach($conn as $name) {
+                if (preg_match('/^char\-([^\-]+)\-(.*)$/i', $name, $match)) {
+                    $login = $match[1];
+                    $char = $match[2];
+
+                    if (isset($this->loginConnections[$login])) {
+                        $this->loginConnections[$login]->chars[$char] = (object)[
+                            'name' => $name
+                        ];
+                    }
+                }
+            }
         }
+    }
+
+    /**
+     * Obtém todos os nomes de logins servers
+     *
+     * @return array
+     */
+    public function getAllLoginServers()
+    {
+        return array_keys($this->loginConnections);
+    }
+
+    /**
+     * Obtém o nome de conexão para o login-server escolhido.
+     *
+     * @param string $name Nome do login-server.
+     *
+     * @return string Nome da conexão para o login-server.
+     */
+    public function getLoginConnection($loginServer)
+    {
+        if (!isset($this->loginConnections[$loginServer]))
+            return null;
+
+        return $this->loginConnections[$loginServer]->name;
+    }
+
+    /**
+     * Obtém o nome do primeiro login server.
+     *
+     * @return string Nome do primeiro login-server
+     */
+    public function getFirstLoginServer()
+    {
+        return $this->getAllLoginServers()[0];
+    }
+
+    /**
+     * Obtém a primeira conexão com o login-server.
+     *
+     * @return string Nome da conexão do primeiro char-server.
+     */
+    public function getFirstLoginConnection()
+    {
+        return $this->getLoginConnection($this->getFirstLoginServer());
+    }
+
+    /**
+     * Obtém o nome de todos os char-servers vinculados ao login-server
+     *
+     * @param string $loginServer
+     *
+     * @return array Char-servers vinculados
+     */
+    public function getAllCharServersFromLogin($loginServer)
+    {
+        if (!isset($this->loginConnections[$loginServer]))
+            return null;
+
+        return array_keys($this->loginConnections[$loginServer]->chars);
+    }
+
+    /**
+     * Obtém o nome da conexão do char-server vinculado ao login-server informado.
+     *
+     * @param string $loginServer nome do login server
+     * @param string $charServer nome do char-server
+     *
+     * @return string Nome da conexão do char-server
+     */
+    public function getCharServerConnection($loginServer, $charServer)
+    {
+        if (!isset($this->loginConnections[$loginServer]))
+            return null;
+
+        if (!isset($this->loginConnections[$loginServer]->chars[$charServer]))
+            return null;
+
+        return $this->loginConnections[$loginServer]->chars[$charServer]->name;
     }
 
     /**
@@ -162,6 +278,8 @@ class App extends CHZApp\Application
                 $table->boolean('ga_enabled')->default(false);
                 $table->string('ga_secret', 16)->nullable();
                 $table->string('language', 30)->nullable();
+                $table->string('loginConnection', 100)->nullable();
+                $table->string('charConnection', 100)->nullable();
                 $table->timestamps();
 
                 $table->index(['email', 'password']);
