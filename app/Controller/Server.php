@@ -34,28 +34,25 @@ class Server extends ControllerParser
      */
     public function status_char_GET($response, $args)
     {
-        // Dados de retorno
-        $data = [
-            'name' => $args['name'],
-            'login' => false,
-            'char' => false,
-            'map' => false
-        ];
+        $name = strtolower($args['name']);
 
-        $charServer = Model_ServerChar::where([
-            'name' => $data['name']
-        ])->first();
-
-
-        if (!is_null($charServer)) {
-            $data = array_merge($data, [
-                'login' => $charServer->loginServer->status,
-                'char' => $charServer->char_status,
-                'map' => $charServer->map_status,
-            ]);
-        }
-
-        return $response->withJson($data);
+        return $response->withJson(self::fullStatus()->filter(function($v) use ($name) {
+            return $v->status->chars->count(function($char) use ($name) {
+                return $char->name == $name;
+            });
+        })->map(function($v) use ($name) {
+            return $v->status->chars->filter(function($c) use ($name) {
+                return strtolower($c->name) == $name;
+            })->map(function($char) use ($v) {
+                return (object)[
+                    'name' => $char->name,
+                    'next_check' => $v->next_check,
+                    'login' => $v->status->login,
+                    'char' => $char->char,
+                    'map' => $char->map,
+                ];
+            })->first();
+        })->first());
     }
 
     /**
@@ -71,11 +68,21 @@ class Server extends ControllerParser
      */
     public function index_GET($response, $args)
     {
-        // Faz teste de verificação para próxima verificação.
-        $next_check = time() + $this->getConfig()->server->checkDelay;
+        // Responde com o status do servidor...
+        return $response->withJson(self::fullStatus());
+    }
 
-        // Obtém os status dos servidores para fazer a exibição dos status.
-        $status = Model_ServerLogin::all()->each(function($login) use ($next_check) {
+    /**
+     * Obtém os status do servidor para resposta.
+     *
+     * @return object
+     */
+    public static function fullStatus()
+    {
+        // Faz teste de verificação para próxima verificação.
+        $next_check = time() + \App::getInstance()->getConfig()->server->checkDelay;
+
+        return Model_ServerLogin::all()->each(function($login) use ($next_check) {
             // Tenta efetuar o ping na porta de login...
             $errno = $errstr = '';
 
@@ -104,14 +111,14 @@ class Server extends ControllerParser
 
         })->map(function($login) {
             $login->refresh();
-            return [
+            return (object)[
                 'name' => $login->name,
                 'next_check' => $login->next_check,
                 'account_count' => $login->accounts->count(),
-                'status' => [
+                'status' => (object)[
                     'login' => $login->status,
                     'chars' => $login->charServers->map(function($char) {
-                        return [
+                        return (object)[
                             'name' => $char->name,
                             'char' => $char->char_status,
                             'map' => $char->map_status,
@@ -120,8 +127,5 @@ class Server extends ControllerParser
                 ]
             ];
         });
-
-        // Responde com o status do servidor...
-        return $response->withJson($status);
     }
 }
