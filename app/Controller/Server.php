@@ -37,9 +37,9 @@ class Server extends ControllerParser
         $name = strtolower($args['name']);
 
         return $response->withJson(self::fullStatus()->filter(function($v) use ($name) {
-            return $v->status->chars->count(function($char) use ($name) {
-                return $char->name == $name;
-            });
+            return !is_null($v->status->chars->first(function($char) use ($name) {
+                return strtolower($char->name) == $name;
+            }));
         })->map(function($v) use ($name) {
             return $v->status->chars->filter(function($c) use ($name) {
                 return strtolower($c->name) == $name;

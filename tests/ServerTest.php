@@ -18,6 +18,8 @@
  */
 require_once 'app/autoload.php';
 
+use \Model\ServerChar as Model_ServerChar;
+
 class ServerTest extends PHPUnit\Framework\TestCase
 {
     public function setUp()
@@ -45,6 +47,19 @@ class ServerTest extends PHPUnit\Framework\TestCase
 		copy($configFileFrom, $configFile);
 
         $this->prepareApp();
+    }
+
+    /**
+     * Faz o teste de servidor de personagens...
+     */
+    public function testStatusChar()
+    {
+        $char = Model_ServerChar::all()->get()->first();
+
+        $this->assertNotNull($char);
+        $this->assertInstanceOf('Model\ServerChar', $char);
+        $this->assertNotNull($char->loginServer);
+        $this->assertEquals(1, $char->loginServer->id);
     }
 
     public function testStatusCharGet()
