@@ -171,7 +171,7 @@ class App extends CHZApp\Application
         if (!isset($this->loginConnections[$loginServer]))
             return null;
 
-        return $this->loginConnections[$loginServer]->id;
+        return $this->loginConnections[$loginServer]->login_id;
     }
 
     /**
