@@ -160,6 +160,21 @@ class App extends CHZApp\Application
     }
 
     /**
+     * Obtém o código do registro de login no banco de dados.
+     *
+     * @param string $loginServer
+     *
+     * @return int Código do login
+     */
+    public function getLoginId($loginServer)
+    {
+        if (!isset($this->loginConnections[$loginServer]))
+            return null;
+
+        return $this->loginConnections[$loginServer]->id;
+    }
+
+    /**
      * Obtém o nome do primeiro login server.
      *
      * @return string Nome do primeiro login-server
@@ -545,6 +560,7 @@ class App extends CHZApp\Application
                 $this->loginConnections[$match[1]] = (object)[
                     'name' => $name,
                     'md5' => false,
+                    'login_id' => 0,
                     'chars' => []
                 ];
             }
@@ -590,8 +606,10 @@ class App extends CHZApp\Application
 
             // Se houver a conexão do login-server, marca informações
             // de uso da senha md5 para poder fazer os testes corretamente.
-            if (isset($this->loginConnections[strtolower($login->name)]))
+            if (isset($this->loginConnections[strtolower($login->name)])) {
+                $this->loginConnections[strtolower($login->name)]->login_id = $l->id;
                 $this->loginConnections[strtolower($login->name)]->md5 = $l->md5;
+            }
 
             foreach ($login->charServer as $char) {
                 $c = $l->charServers->first(function($charServer) use ($char) {

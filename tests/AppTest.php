@@ -65,6 +65,12 @@ class AppTest extends PHPUnit\Framework\TestCase
 		$loginConnection = $app->getFirstLoginConnection();
 		$this->assertEquals('login-ragnaservice', $loginConnection);
 
+		$loginIdNull = $app->getLoginId('null-login');
+		$this->assertNull($loginIdNull);
+
+		$loginId = $app->getLoginId($loginServer);
+		$this->assertEquals(1, $loginId);
+
 		$loginMd5Null = $app->getLoginMd5('null-login');
 		$this->assertNull($loginMd5Null);
 
