@@ -42,6 +42,7 @@ return [
     'Endereço de e-mail não pertence a nenhum perfil.' => '',
     'Reset de senha foi enviado para o e-mail do perfil' => '',
     'Nome de usuário e senha inválidos ou cadastro bloqueado.' => '',
+    'Informação de servidores alteradas com sucesso' => '',
 
     // app/View/mail.html
     'Olá <strong>%s</strong>!' => '',

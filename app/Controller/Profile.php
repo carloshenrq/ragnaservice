@@ -47,6 +47,30 @@ class Profile extends ControllerParser
     }
 
     /**
+     * Informações para troca de dados de servidor padrão do perfil
+     */
+    public function change_server_POST($response, $args)
+    {
+        $loginServer = $charServer = null;
+
+        if (!empty($this->post['loginServer'])) $loginServer = $this->post['loginServer'];
+        if (!empty($this->post['charServer'])) $charServer = $this->post['charServer'];
+
+        // Informações de perfil para servidor
+        if (!$this->getApplication()->getProfile()->changeServer($loginServer, $charServer))
+            return $response->withJson([
+                'success' => false,
+                'message' => __t('Verifique os servidores informados e tente novamente.')
+            ]);
+
+        // Retorna informações de update para a tela.
+        return $response->withJson([
+            'success' => true,
+            'message' => __t('Informação de servidores alteradas com sucesso')
+        ]);
+    }
+
+    /**
      * Faz a chamada para alterações de informações do perfil.
      */
     public function change_settings_POST($response, $args)

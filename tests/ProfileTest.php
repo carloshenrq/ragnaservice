@@ -51,6 +51,104 @@ class ProfileTest extends PHPUnit\Framework\TestCase
         $this->prepareApp();
     }
 
+    public function testProfileServer0()
+    {
+        // Dados para validação do perfil
+        $container = $this->appObj->getContainer();
+        $environment = $container['environment'];
+
+        // Ambiente padrão para execução do URI.
+        $environment['REQUEST_METHOD'] = 'POST';
+        $environment['REQUEST_URI'] = '/profile/login';
+        $environment['CONTENT_TYPE'] = 'multipart/form-data';
+        $environment['SERVER_NAME'] = 'app-travis-debug';
+
+        $_POST['email'] = 'a@a.com';
+        $_POST['password'] = 'admin';
+
+        $response = $this->appObj->run();
+
+        $body = $this->appObj->getBodyContent();
+        $jsonToken = json_decode($body);
+
+        // Código do token que será usado para as próximas requisições...
+        $token = $jsonToken->token;
+
+        unset($response, $body, $jsonToken);
+
+        $this->prepareApp();
+        $container = $this->appObj->getContainer();
+
+        $environment = $container['environment'];
+        $environment['REQUEST_METHOD'] = 'POST';
+        $environment['REQUEST_URI'] = '/profile/change/server';
+        $environment['CONTENT_TYPE'] = 'multipart/form-data';
+        $environment['HTTP_X_REQUEST_APPTOKEN'] = $token;
+        $environment['SERVER_NAME'] = 'app-travis-debug';
+
+        $_POST['loginServer'] = '1';
+        $_POST['charServer'] = '1';
+
+        $response = $this->appObj->run();
+
+        $body = $this->appObj->getBodyContent();
+        $jsonToken = json_decode($body);
+
+        $this->assertTrue(isset($jsonToken->success));
+        $this->assertFalse($jsonToken->success);
+        $this->assertEquals('Verifique os servidores informados e tente novamente.', $jsonToken->message);
+
+        // Teste com login-server correto e char-server incorreto.
+        unset($response, $body, $jsonToken);
+
+        $this->prepareApp();
+        $container = $this->appObj->getContainer();
+
+        $environment = $container['environment'];
+        $environment['REQUEST_METHOD'] = 'POST';
+        $environment['REQUEST_URI'] = '/profile/change/server';
+        $environment['CONTENT_TYPE'] = 'multipart/form-data';
+        $environment['HTTP_X_REQUEST_APPTOKEN'] = $token;
+        $environment['SERVER_NAME'] = 'app-travis-debug';
+
+        $_POST['loginServer'] = 'ragnaservice';
+        $_POST['charServer'] = '1';
+
+        $response = $this->appObj->run();
+
+        $body = $this->appObj->getBodyContent();
+        $jsonToken = json_decode($body);
+
+        $this->assertTrue(isset($jsonToken->success));
+        $this->assertFalse($jsonToken->success);
+        $this->assertEquals('Verifique os servidores informados e tente novamente.', $jsonToken->message);
+
+        // Teste com login-server correto e char-server correto.
+        unset($response, $body, $jsonToken);
+
+        $this->prepareApp();
+        $container = $this->appObj->getContainer();
+
+        $environment = $container['environment'];
+        $environment['REQUEST_METHOD'] = 'POST';
+        $environment['REQUEST_URI'] = '/profile/change/server';
+        $environment['CONTENT_TYPE'] = 'multipart/form-data';
+        $environment['HTTP_X_REQUEST_APPTOKEN'] = $token;
+        $environment['SERVER_NAME'] = 'app-travis-debug';
+
+        $_POST['loginServer'] = 'ragnaservice';
+        $_POST['charServer'] = 'ragnarok';
+
+        $response = $this->appObj->run();
+
+        $body = $this->appObj->getBodyContent();
+        $jsonToken = json_decode($body);
+
+        $this->assertTrue(isset($jsonToken->success));
+        $this->assertTrue($jsonToken->success);
+        $this->assertEquals('Informação de servidores alteradas com sucesso', $jsonToken->message);
+    }
+
     public function testProfileSettings0()
     {
         // Dados para validação do perfil

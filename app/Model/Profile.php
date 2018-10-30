@@ -45,6 +45,32 @@ class Profile extends Eloquent_Model
     }
 
     /**
+     * Faz a mudança de servidores para o usuário.
+     *
+     * @param string $loginServer
+     * @param string $charServer
+     */
+    public function changeServer($loginServer = null, $charServer = null)
+    {
+        $app = \App::getInstance();
+
+        if (!is_null($loginServer) && is_null($app->getLoginConnection($loginServer)))
+            return false;
+
+        // Grava o login-server do usuário.
+        $this->loginServer = $loginServer;
+        $this->save();
+
+        if (!is_null($charServer) && is_null($app->getCharServerConnection($loginServer, $charServer)))
+            return false;
+
+        $this->charServer = $charServer;
+        $this->save();
+
+        return true;
+    }
+
+    /**
      * Faz alterações de informações padrões do perfil
      * do usuários
      */
