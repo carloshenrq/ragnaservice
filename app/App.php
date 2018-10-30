@@ -113,35 +113,8 @@ class App extends CHZApp\Application
             $this->setEloquentConfigs($config->connections);
             $this->registerModels();
             $this->loadLanguage();
+            $this->parseLoginConnections();
             $this->parseServers();
-
-            // Verifica todas as conexões, pelas chaves e atribui a mesma em vetores
-            // para os perfils saberem quais conexões irão usar...
-            $conn = array_keys((array)$config->connections);
-
-            // Faz primeiro o tratamento de todas as conexões com os logins 
-            foreach($conn as $name) {
-                if (preg_match('/^login\-(.*)/i', $name, $match)) {
-                    $this->loginConnections[$match[1]] = (object)[
-                        'name' => $name,
-                        'chars' => []
-                    ];
-                }
-            }
-
-            // Agora, faz o tratamento de todas as conexões de char-server...
-            foreach($conn as $name) {
-                if (preg_match('/^char\-([^\-]+)\-(.*)$/i', $name, $match)) {
-                    $login = $match[1];
-                    $char = $match[2];
-
-                    if (isset($this->loginConnections[$login])) {
-                        $this->loginConnections[$login]->chars[$char] = (object)[
-                            'name' => $name
-                        ];
-                    }
-                }
-            }
         }
     }
 
@@ -168,6 +141,22 @@ class App extends CHZApp\Application
             return null;
 
         return $this->loginConnections[$loginServer]->name;
+    }
+
+    /**
+     * Obtém os dados de md5 para saber se o servidor suporta
+     * senha md5.
+     *
+     * @param string $loginServer
+     *
+     * @return boolean Nome do servidor
+     */
+    public function getLoginMd5($loginServer)
+    {
+        if (!isset($this->loginConnections[$loginServer]))
+            return null;
+
+        return $this->loginConnections[$loginServer]->md5;
     }
 
     /**
@@ -278,8 +267,8 @@ class App extends CHZApp\Application
                 $table->boolean('ga_enabled')->default(false);
                 $table->string('ga_secret', 16)->nullable();
                 $table->string('language', 30)->nullable();
-                $table->string('loginConnection', 100)->nullable();
-                $table->string('charConnection', 100)->nullable();
+                $table->string('loginServer', 100)->nullable();
+                $table->string('charServer', 100)->nullable();
                 $table->timestamps();
 
                 $table->index(['email', 'password']);
@@ -337,6 +326,7 @@ class App extends CHZApp\Application
                 $table->engine = 'InnoDB';
                 $table->increments('id');
                 $table->string('name', 30)->nullable();
+                $table->boolean('md5')->default(false);
                 $table->string('address', 20)->default('127.0.0.1');
                 $table->integer('port')->default(6900);
                 $table->boolean('status')->default(false);
@@ -541,6 +531,41 @@ class App extends CHZApp\Application
     }
 
     /**
+     * Dados de tratamento de conexão dos logins
+     */
+    public function parseLoginConnections()
+    {
+        // Verifica todas as conexões, pelas chaves e atribui a mesma em vetores
+        // para os perfils saberem quais conexões irão usar...
+        $conn = array_keys((array)$this->getConfig()->connections);
+
+        // Faz primeiro o tratamento de todas as conexões com os logins 
+        foreach($conn as $name) {
+            if (preg_match('/^login\-(.*)/i', $name, $match)) {
+                $this->loginConnections[$match[1]] = (object)[
+                    'name' => $name,
+                    'md5' => false,
+                    'chars' => []
+                ];
+            }
+        }
+
+        // Agora, faz o tratamento de todas as conexões de char-server...
+        foreach($conn as $name) {
+            if (preg_match('/^char\-([^\-]+)\-(.*)$/i', $name, $match)) {
+                $login = $match[1];
+                $char = $match[2];
+
+                if (isset($this->loginConnections[$login])) {
+                    $this->loginConnections[$login]->chars[$char] = (object)[
+                        'name' => $name
+                    ];
+                }
+            }
+        }
+    }
+
+    /**
      * Realiza o tratamento de gravar os dados de servidor direto no banco de dados.
      */
     public function parseServers()
@@ -555,12 +580,18 @@ class App extends CHZApp\Application
                 // Cria a entrada do servidor...
                 $l = Model_ServerLogin::create([
                     'name' => $login->name,
+                    'md5' => $login->md5,
                     'address' => $login->address,
                     'port' => $login->port,
                     'status' => false,
                     'next_check' => 0
                 ]);
             }
+
+            // Se houver a conexão do login-server, marca informações
+            // de uso da senha md5 para poder fazer os testes corretamente.
+            if (isset($this->loginConnections[strtolower($login->name)]))
+                $this->loginConnections[strtolower($login->name)]->md5 = $l->md5;
 
             foreach ($login->charServer as $char) {
                 $c = $l->charServers->first(function($charServer) use ($char) {

@@ -118,7 +118,7 @@ class Profile extends ControllerParser
         $birthdate = $this->post['birthdate'];
         $email = $this->post['email'];
         $password = $this->post['password'];
-        $loginConnection = $this->getApplication()->getFirstLoginConnection();
+        $loginServer = $this->getApplication()->getFirstLoginServer();
 
         // Verifica a existencia do e-mail informado...
         // Caso já exista, não irá permitir criar novamente...
@@ -148,8 +148,8 @@ class Profile extends ControllerParser
             'facebook_id' => null,
             'ga_enabled' => false,
             'ga_secret' => null,
-            'loginConnection' => $loginConnection,
-            'charConnection' => null
+            'loginServer' => $loginServer,
+            'charServer' => null
         ])->refresh();
 
         // Retorna informações para a tela...

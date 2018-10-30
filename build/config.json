@@ -3,15 +3,16 @@
         "name" : "RagnaService",
         "checkDelay" : 60,
         "login" : [{
-            "name" : "RagnaService",
-            "address" : "127.0.0.1",
-            "port" : 6900,
+            "name": "RagnaService",
+            "address": "127.0.0.1",
+            "port": 6900,
+            "md5": false,
             "charServer" : [{
-                "name" : "Ragnarok",
-                "charAddress" : "127.0.0.1",
-                "charPort" : 6121,
-                "mapAddress" : "127.0.0.1",
-                "mapPort" : 5121
+                "name": "Ragnarok",
+                "charAddress": "127.0.0.1",
+                "charPort": 6121,
+                "mapAddress": "127.0.0.1",
+                "mapPort": 5121
             }]
         }]
     },

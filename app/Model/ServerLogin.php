@@ -40,7 +40,7 @@ class ServerLogin extends Eloquent_Model
     protected $connection = 'default';
 
     protected $fillable = [
-        'name', 'address', 'port', 'status', 'next_check'
+        'name', 'md5', 'address', 'port', 'status', 'next_check'
     ];
 
     protected $dates = [
