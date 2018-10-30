@@ -54,7 +54,7 @@ class ServerTest extends PHPUnit\Framework\TestCase
      */
     public function testStatusChar()
     {
-        $char = Model_ServerChar::all()->get()->first();
+        $char = Model_ServerChar::all()->first();
 
         $this->assertNotNull($char);
         $this->assertInstanceOf('Model\ServerChar', $char);
