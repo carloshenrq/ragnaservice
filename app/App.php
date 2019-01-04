@@ -455,15 +455,52 @@ class App extends CHZApp\Application
         if ($this->langLoaded)
             return;
 
+        // Zera informações de tradução ao carregar o método. Just-in-case
+        $this->langTranslate = [];
+
         // Arquivo de linguagem solicitado...
         $langFile = join(DIRECTORY_SEPARATOR, [
             __DIR__, '..', 'lang', $this->getLang() . '.php'
         ]);
+        $langCacheFile = join(DIRECTORY_SEPARATOR, [
+            __DIR__, '..', 'lang', $this->getLang() . '.cache.php'
+        ]);
 
         // Se não existir o arquivo de linguagem, então
-        // será usado o idioma padrão
-        if (file_exists($langFile))
-            $this->langTranslate = require_once($langFile);
+        // será usado o idioma padrão.
+        if (file_exists($langFile)) {
+            // Caso exista informações de linguagem e não exista o arquivo
+            // de cache, irá criar o arquivo de cache
+            if (!file_exists($langCacheFile)) {
+                $aTmpLanguage = [];
+                $langTranslate = include($langFile);
+                foreach ($langTranslate as $orig => $trans) {
+                    $aTmpLanguage[$this->getHash($orig)] = $trans;
+                }
+                $aTmpLanguage[$this->getHash('__hash')] = hash_file('sha512', $langFile);
+                // Arrays com chaves indexadas com inteiro
+                // em ordem, são mais rápidas para acessar.
+                /*
+                If you use only integers as array keys in PHP 7 and make sure that you insert them into the array in ascending order, you can see improvements of 10x faster array operations.
+                => https://blog.blackfire.io/php-7-performance-improvements-packed-arrays.html
+                */
+                ksort($aTmpLanguage);
+                file_put_contents($langCacheFile, serialize($aTmpLanguage));
+                $this->loadLanguage();
+                return;
+            } else {
+                $cacheLang = unserialize(file_get_contents($langCacheFile));
+
+                if ($cacheLang[$this->getHash('__hash')] !== hash_file('sha512', $langFile)) {
+                    unlink($langCacheFile);
+                    $this->loadLanguage();
+                    return;
+                }
+
+                // Carrega os dados de linguagem informados.
+                $this->langTranslate = $cacheLang;
+            }
+        }
 
         $this->langLoaded = true;
     }
@@ -477,6 +514,36 @@ class App extends CHZApp\Application
      */
     public function getTranslate($message)
     {
-        return ((isset($this->langTranslate[$message])) ? $this->langTranslate[$message] : $message);
+        $mhash = $this->getHash($message);
+
+        if (isset($this->langTranslate[$mhash]))
+            return $this->langTranslate[$mhash];
+
+        return $message;
+    }
+
+    /** 
+     * Obtém o hashing para uma string informada.
+     * 
+     * @param string $str String a ser usada para o hashing
+     *
+     * @return integer Inteiro do hashing
+     */
+    public function getHash($str)
+    {
+        $hashCount = 0;
+        $size = strlen($str);
+
+        for($i = 0; $i < $size; $i++) {
+            $hashCount += ord($str[$i]);
+            $hashCount += $hashCount << 10;
+            $hashCount ^= $hashCount >> 6;
+        }
+
+        $hashCount += $hashCount << 3;
+        $hashCount ^= $hashCount >> 11;
+        $hashCount += $hashCount << 15;
+
+        return $hashCount;
     }
 }
