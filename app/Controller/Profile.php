@@ -325,7 +325,7 @@ class Profile extends ControllerParser
         if (!($token instanceof Model_TokenProfile))
             return $response->withJson([
                 'error' => true,
-                'message' => __t("Nome de usuário e senha inválidos ou cadastro bloqueado.")
+                'message' => __t('Nome de usuário e senha inválidos ou cadastro bloqueado.')
             ]);
 
         return $response->withJson([

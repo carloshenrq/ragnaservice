@@ -88,7 +88,7 @@ class App extends CHZApp\Application
 
 
             if (is_null($config))
-                throw new Exception(__t("Falha na leitura do arquivo de configuração."));
+                throw new Exception(__t('Falha na leitura do arquivo de configuração.'));
 
             // Define as configurações da aplicação.
             $this->setConfig($config);
