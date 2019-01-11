@@ -58,6 +58,61 @@ class AppTest extends PHPUnit\Framework\TestCase
 					->setMethods(['getException'])
 					->getMock();
 
+		$langEx = join(DIRECTORY_SEPARATOR, [
+			__DIR__,
+			'..',
+			'lang',
+			'example.php'
+		]);
+		$langEn = join(DIRECTORY_SEPARATOR, [
+			__DIR__,
+			'..',
+			'lang',
+			'en_US.php'
+		]);
+
+		// copia o arquivo de linguagem...
+		$this->assertTrue(copy($langEx, $langEn));
+
+		// Arquivo de linguagem em inglês existe!
+		$this->assertTrue(file_exists($langEn));
+
+		// Define a linguagem como a estrangeira.
+		$app->setLang('en_US');
+		$app->loadLanguage();
+
+		// Verifica informações da linguagem carregada
+		$this->assertEquals($app->getLang(), 'en_US');
+		$this->assertEquals($app->getTranslate('Falha na leitura do arquivo de configuração.'), '');
+
+		// Retorna ao pt_BR
+		$app->setLang('pt_BR');
+		$app->loadLanguage();
+
+		// Verifica se o texto não está sendo traduzido.
+		$this->assertEquals($app->getLang(), 'pt_BR');
+		$this->assertEquals($app->getTranslate('Falha na leitura do arquivo de configuração.'), 'Falha na leitura do arquivo de configuração.');
+		
+		// Altera o arquivo para saber se o cache está igual.
+		// Se não estiver, irá atualizar o teste e refazer o arquivo
+		file_put_contents($langEn, ' ', FILE_APPEND);
+
+		// Define a linguagem como a estrangeira.
+		$app->setLang('en_US');
+		$app->loadLanguage();
+
+		// Verifica informações da linguagem carregada
+		$this->assertEquals($app->getLang(), 'en_US');
+		$this->assertEquals($app->getTranslate('Falha na leitura do arquivo de configuração.'), '');
+
+		// Retorna ao pt_BR
+		$app->setLang('pt_BR');
+		$app->loadLanguage();
+
+		// Verifica se o texto não está sendo traduzido.
+		$this->assertEquals($app->getLang(), 'pt_BR');
+		$this->assertEquals($app->getTranslate('Falha na leitura do arquivo de configuração.'), 'Falha na leitura do arquivo de configuração.');
+
 		/** TESTES DE MÉTODOS DE OBTER A CONEXÃO REFERENTE AO LOGIN/CHAR QUE IRÃO SE CONECTAR **/
 		$loginServer = $app->getFirstLoginServer();
 		$this->assertEquals('ragnaservice', $loginServer);
