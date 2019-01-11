@@ -30,9 +30,9 @@ class ProfileObserver
      */
     public function updating(Model_Profile $profile)
     {
-        if ($profile->isDirty('verified') && $profile->verified) {
-            // @todo Enviar e-mail informando que o usuário foi verificado com sucesso.
-        }
+        // if ($profile->isDirty('verified') && $profile->verified) {
+        //     // Enviar e-mail informando que o usuário foi verificado com sucesso.
+        // }
     }
 
     /**

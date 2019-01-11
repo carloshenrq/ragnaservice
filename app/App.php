@@ -239,7 +239,7 @@ class App extends CHZApp\Application
         if ($this->getInstallMode())
             return;
         
-        $profileCreated = true;
+        $profileCreated = $schema->hasTable('profile');
 
         if (!$schema->hasTable('token')) {
             $schema->create('token', function($table) {
@@ -263,7 +263,7 @@ class App extends CHZApp\Application
             ]);
         }
 
-        if (!($profileCreated = $schema->hasTable('profile'))) {
+        if (!$profileCreated) {
             $schema->create('profile', function($table) {
                 $table->engine = 'InnoDB';
                 $table->increments('id');
