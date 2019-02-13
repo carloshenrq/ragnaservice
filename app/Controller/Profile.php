@@ -242,7 +242,9 @@ class Profile extends ControllerParser
         $code = $this->post['code'];
 
         $reset = Model_ProfileReset::where([
-            ['code', '=', $code]
+            ['code', '=', $code],
+            ['used', '=', false],
+            ['expires_at', '>=', (new \DateTime())->format('Y-m-d H:i:s')]
         ])->first();
 
         if (is_null($reset))
