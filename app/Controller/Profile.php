@@ -59,6 +59,12 @@ class Profile extends ControllerParser
         if (empty($birthdate))
             $birthdate = null;
 
+        if (!empty($birthdate) && self::verifyBirthDate($birthdate) === false)
+            return $response->withJson([
+                'error' => true,
+                'message' => __t('Data de nascimento informada é inválida ou idade inferior a 5 anos.')
+            ]);
+
         // Grava as alterações no perfil do usuário
         $this->getApplication()->getProfile()->changeSettings($name, $gender, $birthdate);
 
@@ -119,6 +125,26 @@ class Profile extends ControllerParser
         $email = $this->post['email'];
         $password =$this->post['password'];
 
+        // Informações de data de nascimento
+        $dt_birth = null;
+
+        // Verifica se o endereço de e-mail informado é valido
+        if (self::verifyMail($email) === false)
+            return $response->withJson([
+                'error' => true,
+                'message' => __t('O Endereço de e-mail informado é inválido.')
+            ]);
+
+        // Verifica a data de nascimento para cadastrar no perfil
+        if (!empty($birthdate)) {
+            if (self::verifyBirthDate($birthdate) === false)
+                return $response->withJson([
+                    'error' => true,
+                    'message' => __t('Data de nascimento informada é inválida ou idade inferior a 5 anos.')
+                ]);
+            $dt_birth = new \DateTime($birthdate);
+        }
+
         // Verifica a existencia do e-mail informado...
         // Caso já exista, não irá permitir criar novamente...
         $existing = Model_Profile::where([
@@ -135,7 +161,7 @@ class Profile extends ControllerParser
         $profile = Model_Profile::create([
             'name' => $name,
             'gender' => $gender,
-            'birthdate' => new \DateTime($birthdate),
+            'birthdate' => $dt_birth,
             'email' => $email,
             'password' => hash('sha512', $password),
             'permission' => $this->getConfig()->profile->permission,
@@ -271,6 +297,12 @@ class Profile extends ControllerParser
         // Email para enviar uma possível recuperação de senha.
         $email = $this->post['email'];
 
+        if (self::verifyMail($email) === false)
+            return $response->withJson([
+                'error' => true,
+                'message' => __t('O Endereço de e-mail informado é inválido.')
+            ]);
+
         // Obtém o perfil para ser verificado...
         $profile = Model_Profile::where([
             ['email', '=', $email]
@@ -321,6 +353,12 @@ class Profile extends ControllerParser
     {
         $email = $this->post['email'];
         $password = $this->post['password'];
+
+        if (self::verifyMail($email) === false)
+            return $response->withJson([
+                'error' => true,
+                'message' => __t('O Endereço de e-mail informado é inválido.')
+            ]);
 
         $token = Model_Profile::login($email, $password);
 
@@ -392,5 +430,51 @@ class Profile extends ControllerParser
                 'verify' => $verify,
                 'now' => new \DateTime(),
            ]);
+    }
+
+    /**
+     * Verifica um endereço de e-mail.
+     * 
+     * @param string $email
+     * 
+     * @return boolean Verdadeiro caso o e-mail seja válido.
+     */
+    public static function verifyMail($email)
+    {
+        return (!empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL) !== false);
+    }
+
+    /**
+     * Faz a validação de uma data de nascimento.
+     * 
+     * @param string $date
+     * 
+     * @return boolean Verdadeiro caso seja válida
+     */
+    public static function verifyBirthDate($date)
+    {
+        // A data deve vir no formato: YYYY-MM-DD
+        if (!preg_match('/^([0-9]{4})\-(0[1-9]|1[0-2])\-(0[1-9]|[1-2][0-9]|3[0-1])/i', $date))
+            return false;
+        
+        // Define o objeto de data...
+        $dt_test = new \DateTime($date);
+
+        // Se a data for diferente da informada, o formato é inválido
+        // Pois avançou no tempo...
+        if ($dt_test->format('Y-m-d') !== $date)
+            return false;
+
+        // Data atual do servidor...
+        $dt_result = $dt_test->diff(new \DateTime());
+
+        // Se houve inversão, a data informada é maior que a data
+        // atual, ninguém nasce no futuro...
+        // Crianças com menos de 5 anos não jogam isso...
+        if ($dt_result->invert || $dt_result->y < 5)
+            return false;
+
+        // Retorna verdadeiro caso a validação de datas seja ok.
+        return true;
     }
 }
