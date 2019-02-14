@@ -56,7 +56,7 @@ install:
     - httpd -k install -n "Apache24"
     - net start Apache24
     - cd \
-    - git clone https://github.com/HerculesWS/Hercules.git tmp
+    - git clone --depth 1 https://github.com/HerculesWS/Hercules.git tmp
 
 before_test:
     - ruby -v

@@ -41,7 +41,7 @@ before_install:
   - sudo cp -f build/travis-ci-apache /etc/apache2/sites-available/000-default.conf
   - sudo sed -e "s?%TRAVIS_BUILD_DIR%?$(pwd)?g" --in-place /etc/apache2/sites-available/000-default.conf
   - sudo service apache2 restart
-  - git clone https://github.com/HerculesWS/Hercules.git tmp
+  - git clone --depth 1 https://github.com/HerculesWS/Hercules.git tmp
   - mysql -uragnarok -pragnarok ragnarok < tmp/sql-files/main.sql
   - mysql -uragnarok -pragnarok ragnarok < tmp/sql-files/logs.sql
   - rm -rf tmp

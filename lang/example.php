@@ -42,6 +42,8 @@ return [
     'Endereço de e-mail não pertence a nenhum perfil.' => '',
     'Reset de senha foi enviado para o e-mail do perfil' => '',
     'Nome de usuário e senha inválidos ou cadastro bloqueado.' => '',
+    'O Endereço de e-mail informado é inválido' => '',
+    'Data de nascimento informada é inválida ou idade inferior a 5 anos.' => '',
     'Informação de servidores alteradas com sucesso' => '',
 
     // app/View/mail.html

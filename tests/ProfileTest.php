@@ -186,7 +186,7 @@ class ProfileTest extends PHPUnit\Framework\TestCase
 
         $_POST['name'] = 'Brazil hue test';
         $_POST['gender'] = 'M';
-        $_POST['birthdate'] = sprintf('%d-01-01', rand(1800, 2018));
+        $_POST['birthdate'] = '2002-01-01';
 
         $response = $this->appObj->run();
 
@@ -245,6 +245,55 @@ class ProfileTest extends PHPUnit\Framework\TestCase
         $this->assertTrue(isset($jsonToken->success));
         $this->assertTrue($jsonToken->success);
         $this->assertEquals('Informações de Perfil foram atualizadas com sucesso', $jsonToken->message);
+    }
+
+    public function testProfileSettings2()
+    {
+        // Dados para validação do perfil
+        $container = $this->appObj->getContainer();
+        $environment = $container['environment'];
+
+        // Ambiente padrão para execução do URI.
+        $environment['REQUEST_METHOD'] = 'POST';
+        $environment['REQUEST_URI'] = '/profile/login';
+        $environment['CONTENT_TYPE'] = 'multipart/form-data';
+        $environment['SERVER_NAME'] = 'app-travis-debug';
+
+        $_POST['email'] = 'a@a.com';
+        $_POST['password'] = 'admin';
+
+        $response = $this->appObj->run();
+
+        $body = $this->appObj->getBodyContent();
+        $jsonToken = json_decode($body);
+
+        // Código do token que será usado para as próximas requisições...
+        $token = $jsonToken->token;
+
+        unset($response, $body, $jsonToken);
+
+        $this->prepareApp();
+        $container = $this->appObj->getContainer();
+
+        $environment = $container['environment'];
+        $environment['REQUEST_METHOD'] = 'POST';
+        $environment['REQUEST_URI'] = '/profile/change/settings';
+        $environment['CONTENT_TYPE'] = 'multipart/form-data';
+        $environment['HTTP_X_REQUEST_APPTOKEN'] = $token;
+        $environment['SERVER_NAME'] = 'app-travis-debug';
+
+        $_POST['name'] = 'Brazil hue test2';
+        $_POST['gender'] = 'F';
+        $_POST['birthdate'] = '2000-13-31';
+
+        $response = $this->appObj->run();
+
+        $body = $this->appObj->getBodyContent();
+        $jsonToken = json_decode($body);
+
+        $this->assertTrue(isset($jsonToken->error));
+        $this->assertTrue($jsonToken->error);
+        $this->assertEquals('Data de nascimento informada é inválida ou idade inferior a 5 anos.', $jsonToken->message);
     }
 
     public function testProfilePass3()
@@ -576,7 +625,7 @@ class ProfileTest extends PHPUnit\Framework\TestCase
 
         $_POST['name'] = 'Administrador';
         $_POST['gender'] = 'O';
-        $_POST['birthdate'] = (new DateTime())->format('Y-m-d');
+        $_POST['birthdate'] = '2000-01-01';
         $_POST['email'] = 'a@a.com';
         $_POST['password'] = 'admin';
         
@@ -587,6 +636,118 @@ class ProfileTest extends PHPUnit\Framework\TestCase
         
         $this->assertFalse(isset($jsonToken->success));
         $this->assertTrue(isset($jsonToken->error));
+    }
+
+    public function testProfileCreateErrorEmail0()
+    {
+        // Dados para validação do perfil
+        $container = $this->appObj->getContainer();
+        $environment = $container['environment'];
+
+        // Ambiente padrão para execução do URI.
+        $environment['REQUEST_METHOD'] = 'POST';
+        $environment['REQUEST_URI'] = '/profile/create';
+        $environment['CONTENT_TYPE'] = 'multipart/form-data';
+        $environment['SERVER_NAME'] = 'app-travis-debug';
+
+        $_POST['name'] = 'Administrador';
+        $_POST['gender'] = 'O';
+        $_POST['birthdate'] = '2000-01-01';
+        $_POST['email'] = 'a@a';
+        $_POST['password'] = 'admin';
+        
+        $response = $this->appObj->run();
+
+        $body = $this->appObj->getBodyContent();
+        $jsonToken = json_decode($body);
+        
+        $this->assertFalse(isset($jsonToken->success));
+        $this->assertTrue(isset($jsonToken->error));
+        $this->assertEquals($jsonToken->message, 'O Endereço de e-mail informado é inválido.');
+    }
+
+    public function testProfileCreateErrorBirthDate0()
+    {
+        // Dados para validação do perfil
+        $container = $this->appObj->getContainer();
+        $environment = $container['environment'];
+
+        // Ambiente padrão para execução do URI.
+        $environment['REQUEST_METHOD'] = 'POST';
+        $environment['REQUEST_URI'] = '/profile/create';
+        $environment['CONTENT_TYPE'] = 'multipart/form-data';
+        $environment['SERVER_NAME'] = 'app-travis-debug';
+
+        $_POST['name'] = 'Administrador';
+        $_POST['gender'] = 'O';
+        $_POST['birthdate'] = '2000-13-01';
+        $_POST['email'] = 'u@u.com';
+        $_POST['password'] = 'admin';
+        
+        $response = $this->appObj->run();
+
+        $body = $this->appObj->getBodyContent();
+        $jsonToken = json_decode($body);
+        
+        $this->assertFalse(isset($jsonToken->success));
+        $this->assertTrue(isset($jsonToken->error));
+        $this->assertEquals($jsonToken->message, 'Data de nascimento informada é inválida ou idade inferior a 5 anos.');
+    }
+
+    public function testProfileCreateErrorBirthDate1()
+    {
+        // Dados para validação do perfil
+        $container = $this->appObj->getContainer();
+        $environment = $container['environment'];
+
+        // Ambiente padrão para execução do URI.
+        $environment['REQUEST_METHOD'] = 'POST';
+        $environment['REQUEST_URI'] = '/profile/create';
+        $environment['CONTENT_TYPE'] = 'multipart/form-data';
+        $environment['SERVER_NAME'] = 'app-travis-debug';
+
+        $_POST['name'] = 'Administrador';
+        $_POST['gender'] = 'O';
+        $_POST['birthdate'] = (new DateTime())->format('Y-m-d');
+        $_POST['email'] = 'u@u.com';
+        $_POST['password'] = 'admin';
+        
+        $response = $this->appObj->run();
+
+        $body = $this->appObj->getBodyContent();
+        $jsonToken = json_decode($body);
+        
+        $this->assertFalse(isset($jsonToken->success));
+        $this->assertTrue(isset($jsonToken->error));
+        $this->assertEquals($jsonToken->message, 'Data de nascimento informada é inválida ou idade inferior a 5 anos.');
+    }
+
+    public function testProfileCreateErrorBirthDate2()
+    {
+        // Dados para validação do perfil
+        $container = $this->appObj->getContainer();
+        $environment = $container['environment'];
+
+        // Ambiente padrão para execução do URI.
+        $environment['REQUEST_METHOD'] = 'POST';
+        $environment['REQUEST_URI'] = '/profile/create';
+        $environment['CONTENT_TYPE'] = 'multipart/form-data';
+        $environment['SERVER_NAME'] = 'app-travis-debug';
+
+        $_POST['name'] = 'Administrador';
+        $_POST['gender'] = 'O';
+        $_POST['birthdate'] = '2000-02-30';
+        $_POST['email'] = 'u@u.com';
+        $_POST['password'] = 'admin';
+        
+        $response = $this->appObj->run();
+
+        $body = $this->appObj->getBodyContent();
+        $jsonToken = json_decode($body);
+        
+        $this->assertFalse(isset($jsonToken->success));
+        $this->assertTrue(isset($jsonToken->error));
+        $this->assertEquals($jsonToken->message, 'Data de nascimento informada é inválida ou idade inferior a 5 anos.');
     }
 
     public function testProfileCreateSuccess()
@@ -603,7 +764,7 @@ class ProfileTest extends PHPUnit\Framework\TestCase
 
         $_POST['name'] = 'Administrador';
         $_POST['gender'] = 'O';
-        $_POST['birthdate'] = (new DateTime())->format('Y-m-d');
+        $_POST['birthdate'] = '2000-01-01';
         $_POST['email'] = 'b@b.com';
         $_POST['password'] = 'admin';
         
@@ -707,7 +868,7 @@ class ProfileTest extends PHPUnit\Framework\TestCase
 
         $_POST['name'] = 'Administrador';
         $_POST['gender'] = 'F';
-        $_POST['birthdate'] = (new DateTime())->format('Y-m-d');
+        $_POST['birthdate'] = '2000-01-01';
         $_POST['email'] = 'c@c.com';
         $_POST['password'] = 'admin';
         
@@ -841,6 +1002,55 @@ class ProfileTest extends PHPUnit\Framework\TestCase
         $this->assertFalse(isset($json->success));
         $this->assertEquals('Código de reset de senha não é valido ou já foi usado.', $json->message);
 	}
+
+    public function testProfileLoginError0()
+    {
+        // Dados para validação do perfil
+        $container = $this->appObj->getContainer();
+        $environment = $container['environment'];
+
+        // Ambiente padrão para execução do URI.
+        $environment['REQUEST_METHOD'] = 'POST';
+        $environment['REQUEST_URI'] = '/profile/login';
+        $environment['CONTENT_TYPE'] = 'multipart/form-data';
+        $environment['SERVER_NAME'] = 'app-travis-debug';
+
+        $_POST['email'] = 'a@a';
+        $_POST['password'] = 'admin';
+        
+        $response = $this->appObj->run();
+
+        $body = $this->appObj->getBodyContent();
+        $jsonToken = json_decode($body);
+        
+        $this->assertFalse(isset($jsonToken->success));
+        $this->assertTrue(isset($jsonToken->error));
+        $this->assertEquals($jsonToken->message, 'O Endereço de e-mail informado é inválido.');
+    }
+
+    public function testProfileResetError0()
+    {
+        // Dados para validação do perfil
+        $container = $this->appObj->getContainer();
+        $environment = $container['environment'];
+
+        // Ambiente padrão para execução do URI.
+        $environment['REQUEST_METHOD'] = 'POST';
+        $environment['REQUEST_URI'] = '/profile/reset';
+        $environment['CONTENT_TYPE'] = 'multipart/form-data';
+        $environment['SERVER_NAME'] = 'app-travis-debug';
+
+        $_POST['email'] = 'a@a';
+        
+        $response = $this->appObj->run();
+
+        $body = $this->appObj->getBodyContent();
+        $jsonToken = json_decode($body);
+        
+        $this->assertFalse(isset($jsonToken->success));
+        $this->assertTrue(isset($jsonToken->error));
+        $this->assertEquals($jsonToken->message, 'O Endereço de e-mail informado é inválido.');
+    }
 
     /**
      * Prepara o App para os testes necessários de envio dos pacotes e etc...
