@@ -51,3 +51,4 @@ script:
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+  - vendor/bin/codacycoverage clover coverage.xml
