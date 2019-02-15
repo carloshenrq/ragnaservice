@@ -204,7 +204,7 @@ class Profile extends ControllerParser
             ['expires_at', '>=', (new \DateTime())->format('Y-m-d H:i:s')]
         ])->first();
 
-        if (is_null($verify))
+        if ($verify === null)
             return $response->withJson([
                 'error' => true,
                 'message' => __t('O Código de verificação informado já foi usado ou não existe.'),
@@ -241,7 +241,7 @@ class Profile extends ControllerParser
                     $v->expires_at->format('Y-m-d') >= (new \DateTime())->format('Y-m-d');
         });
 
-        if (is_null($verify)) {
+        if ($verify === null) {
             $expires_after = sprintf('%d minutes', $this->getConfig()->profile->expires_after);
             Model_ProfileVerify::create([
                 'profile_id' => $profile->id,
@@ -273,7 +273,7 @@ class Profile extends ControllerParser
             ['expires_at', '>=', (new \DateTime())->format('Y-m-d H:i:s')]
         ])->first();
 
-        if (is_null($reset))
+        if ($reset === null)
             return $response->withJson([
                 'error' => true,
                 'message' => __t('Código de reset de senha não é valido ou já foi usado.')
@@ -308,7 +308,7 @@ class Profile extends ControllerParser
             ['email', '=', $email]
         ])->first();
 
-        if (is_null($profile))
+        if ($profile === null)
             return $response->withJson([
                 'error' => true,
                 'message' => __t('Endereço de e-mail não pertence a nenhum perfil.'),
@@ -320,7 +320,7 @@ class Profile extends ControllerParser
         });
 
         // Se não houver resets em aberto, então irá criar um novo
-        if (is_null($reset)) {
+        if ($reset === null) {
             $reset = Model_ProfileReset::create([
                 'profile_id' => $profile->id,
                 'code' => hash('md5', uniqid().microtime(true)),
@@ -374,7 +374,7 @@ class Profile extends ControllerParser
             'profile' => [
                 'name' => $token->profile->name,
                 'gender' => $token->profile->gender,
-                'birthdate' => ((is_null($token->profile->birthdate)) ? null : $token->profile->birthdate->format('Y-m-d'))
+                'birthdate' => (($token->profile->birthdate === null) ? null : $token->profile->birthdate->format('Y-m-d'))
             ]
         ]);
     }

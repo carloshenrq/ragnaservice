@@ -46,14 +46,14 @@ class Token extends Eloquent_Model
             ['permission', '=', 1]
         ])->get()
         ->filter(function($t) use ($now) {
-            return (is_null($t->use_limit) ||
+            return ($t->use_limit === null ||
                 $t->use_limit->format('Y-m-d H:i:s') >= $now->format('Y-m-d H:i:s'));
         })->map(function($t) {
             $profiles = $t->tokenProfile->count();
             return (object)[
                 'id' => $t->id,
                 'token' => $t->token,
-                'expires_at' => ((is_null($t->use_limit)) ? null : $t->use_limit->format('Y-m-d H:i:s')),
+                'expires_at' => (($t->use_limit === null) ? null : $t->use_limit->format('Y-m-d H:i:s')),
                 'connected' => $profiles
             ];
         })->first();

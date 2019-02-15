@@ -47,7 +47,7 @@ class Server extends ControllerParser
 		])->first();
 
 
-		if (!is_null($charServer)) {
+		if ($charServer !== null) {
 			$data = array_merge($data, [
 				'login' => $charServer->loginServer->status,
 				'char' => $charServer->char_status,

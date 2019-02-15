@@ -81,7 +81,7 @@ class Profile extends Eloquent_Model
         // Se o cadastro não existir ou estiver bloqueado
         // o login de usuário é negado!
         // Caso contrario, um novo token é criado e o usuário pode fazer login corretamente
-        if (is_null($profile) || $profile->blocked)
+        if ($profile === null || $profile->blocked)
             return false;
 
         // Deleta todos os tokens existentes para o usuário
