@@ -390,7 +390,6 @@ class App extends CHZApp\Application
             __DIR__, 'Model'
         ]);
         $dirModel = new \DirectoryIterator($modelDir);
-        $modelClasses = [];
 
         foreach($dirModel as $fileModel) {
             if ($fileModel->isDot() || $fileModel->isDir())

@@ -48,14 +48,14 @@ class ProfileObserver
         // irá criar o código de ativação para o mesmo.
         if ($config !== null && $config->profile->verification) {
             // String para a diferença de tempo.
-            $expires_after = sprintf('%d minutes', $config->profile->expires_after);
+            $expiresAfter = sprintf('%d minutes', $config->profile->expires_after);
 
             Model_ProfileVerify::create([
                 'profile_id' => $profile->id,
                 'code' => hash('md5', uniqid().microtime(true)),
                 'used' => false,
                 'used_at' => null,
-                'expires_at' => (new \DateTime())->add(date_interval_create_from_date_string($expires_after))
+                'expires_at' => (new \DateTime())->add(date_interval_create_from_date_string($expiresAfter))
             ]);
         }
     }
