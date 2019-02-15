@@ -67,11 +67,11 @@ class App extends CHZApp\Application
         $this->profile = null;
 
         // Arquivo de configuração
-        $configFile = realpath(join(DIRECTORY_SEPARATOR, [
+        $configFile = join(DIRECTORY_SEPARATOR, [
             __DIR__,
             '..',
             'config.json'
-        ]));
+        ]);
 
         // Inicializa informações do slim com opções padrões de diretório...
         $this->setSmartyConfigs([
@@ -82,8 +82,10 @@ class App extends CHZApp\Application
         // Se conseguiu fazer a leitura dos dados
         // então estará tudo OK para não permitir
         // o módo de instalação.
-        if ($configFile !== false && file_exists($configFile)) {
+        //@codingStandardsIgnoreStart
+        if (file_exists($configFile)) {
             $configContent = file_get_contents($configFile);
+            //@codingStandardsIgnoreEnd
             $config = json_decode($configContent);
 
             if ($config === null)
@@ -397,8 +399,11 @@ class App extends CHZApp\Application
             // Retira a extensão '.php' do final do arquivo
             // e atribui ao vetor de models...
             $modelClass = '\\Model\\' . substr($fileModel->getFilename(), 0, -4);
+
+            //@codingStandardsIgnoreStart
             call_user_func([$modelClass, 'flushEventListeners']);
             call_user_func([$modelClass, 'boot']);
+            //@codingStandardsIgnoreEnd
         }
     }
 
@@ -467,12 +472,14 @@ class App extends CHZApp\Application
 
         // Se não existir o arquivo de linguagem, então
         // será usado o idioma padrão.
+        //@codingStandardsIgnoreStart
         if (file_exists($langFile)) {
             // Caso exista informações de linguagem e não exista o arquivo
             // de cache, irá criar o arquivo de cache
             if (!file_exists($langCacheFile)) {
                 $aTmpLanguage = [];
                 $langTranslate = include($langFile);
+                //@codingStandardsIgnoreEnd
                 foreach ($langTranslate as $orig => $trans) {
                     $aTmpLanguage[$this->getHash($orig)] = $trans;
                 }
@@ -484,14 +491,20 @@ class App extends CHZApp\Application
                 => https://blog.blackfire.io/php-7-performance-improvements-packed-arrays.html
                 */
                 ksort($aTmpLanguage);
+                //@codingStandardsIgnoreStart
                 file_put_contents($langCacheFile, serialize($aTmpLanguage));
+                //@codingStandardsIgnoreEnd
                 $this->loadLanguage();
                 return;
             } else {
+                //@codingStandardsIgnoreStart
                 $cacheLang = unserialize(file_get_contents($langCacheFile));
+                //@codingStandardsIgnoreEnd
 
                 if ($cacheLang[$this->getHash('__hash')] !== hash_file('sha512', $langFile)) {
+                    //@codingStandardsIgnoreStart
                     unlink($langCacheFile);
+                    //@codingStandardsIgnoreEnd
                     $this->loadLanguage();
                     return;
                 }

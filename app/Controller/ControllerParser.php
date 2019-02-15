@@ -96,8 +96,10 @@ abstract class ControllerParser extends CHZApp_Controller
             'config' => $app->getConfig()
         ]), $type, $attach);
 
+        //@codingStandardsIgnoreStart
         if (getenv('TRAVIS_CI_DEBUG') !== false && getenv('TRAVIS_CI_DEBUG') == 1)
             sleep(1);
+        //@codingStandardsIgnoreEnd
     }
 
 }

@@ -46,7 +46,7 @@ class ProfileObserver
         // Se a verificação estiver ativa, então
         // irá marcar o perfil como não verificado e logo após
         // irá criar o código de ativação para o mesmo.
-        if (!is_null($config) && $config->profile->verification) {
+        if ($config !== null && $config->profile->verification) {
             // String para a diferença de tempo.
             $expires_after = sprintf('%d minutes', $config->profile->expires_after);
 
