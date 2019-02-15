@@ -256,7 +256,7 @@ class App extends CHZApp\Application
                 'gender' => 'O',
                 'birthdate' => null,
                 'email' => 'a@a.com',
-                'password' => hash('sha512', 'admin'),
+                'password' => 'admin',
                 'permission' => 3,
                 'blocked' => false,
                 'blocked_reason' => null,

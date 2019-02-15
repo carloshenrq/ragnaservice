@@ -27,10 +27,20 @@ class ProfileVerifyObserver
 {
     public function updating(Model_ProfileVerify $verify)
     {
-        if ($verify->isDirty('used') && $verify->used && !$verify->profile->verified)
+        // Caso o código tenha sido usado, então, irá 
+        // marcar o perfil como verificado.
+        if ($verify->isDirty('used') && $verify->used && !$verify->profile->verified) {
             $verify->profile->update([
                 'verified' => true
             ]);
+        }
+
+        // Atualizou a data e o código ainda não foi usado?
+        // Solicitou re-envio!
+        if ($verify->isDirty('updated_at') && $verify->used === false) {
+            // Faz o envio do código de verificação.
+            Controller_Profile::sendVerifyCode($verify);
+        }
     }
 
     /**

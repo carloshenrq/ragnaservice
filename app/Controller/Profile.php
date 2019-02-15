@@ -81,31 +81,31 @@ class Profile extends ControllerParser
      */
     public function change_password_POST($response, $args)
     {
-        $old_pass = $this->post['old_pass'];
-        $new_pass = $this->post['new_pass'];
-        $cnf_pass = $this->post['cnf_pass'];
+        $oldPass = $this->post['old_pass'];
+        $newPass = $this->post['new_pass'];
+        $cnfPass = $this->post['cnf_pass'];
 
         $profile = $this->getApplication()->getProfile();
 
-        if ($profile->password !== hash('sha512', $old_pass))
+        if ($profile->password !== hash('sha512', $oldPass))
             return $response->withJson([
                 'error' => true,
                 'message' => __t('A Senha atual informada não confere com a senha atual.')
             ]);
         
-        if (hash('sha512', $new_pass) !== hash('sha512', $cnf_pass))
+        if (hash('sha512', $newPass) !== hash('sha512', $cnfPass))
             return $response->withJson([
                 'error' => true,
                 'message' => __t('As novas senhas digitadas não conferem.')
             ]);
         
-        if (hash('sha512', $old_pass) === hash('sha512', $new_pass))
+        if (hash('sha512', $oldPass) === hash('sha512', $newPass))
             return $response->withJson([
                 'error' => true,
                 'message' => __t('Sua nova senha, não pode ser igual antiga.')
             ]);
     
-        $profile->changePassword($new_pass);
+        $profile->changePassword($newPass);
 
         return $response->withJson([
             'success' => true,
@@ -126,7 +126,7 @@ class Profile extends ControllerParser
         $password =$this->post['password'];
 
         // Informações de data de nascimento
-        $dt_birth = null;
+        $dtBirth = null;
 
         // Verifica se o endereço de e-mail informado é valido
         if (self::verifyMail($email) === false)
@@ -142,7 +142,7 @@ class Profile extends ControllerParser
                     'error' => true,
                     'message' => __t('Data de nascimento informada é inválida ou idade inferior a 5 anos.')
                 ]);
-            $dt_birth = new \DateTime($birthdate);
+            $dtBirth = new \DateTime($birthdate);
         }
 
         // Verifica a existencia do e-mail informado...
@@ -161,9 +161,9 @@ class Profile extends ControllerParser
         $profile = Model_Profile::create([
             'name' => $name,
             'gender' => $gender,
-            'birthdate' => $dt_birth,
+            'birthdate' => $dtBirth,
             'email' => $email,
-            'password' => hash('sha512', $password),
+            'password' => $password,
             'permission' => $this->getConfig()->profile->permission,
             'blocked' => false,
             'blocked_reason' => null,
@@ -241,20 +241,18 @@ class Profile extends ControllerParser
                     $v->expires_at->format('Y-m-d') >= (new \DateTime())->format('Y-m-d');
         });
 
-        //@codingStandardsIgnoreStart
         if ($verify === null) {
-            $expires_after = sprintf('%d minutes', $this->getConfig()->profile->expires_after);
-            Model_ProfileVerify::create([
-                'profile_id' => $profile->id,
-                'code' => hash('md5', uniqid().microtime(true)),
-                'used' => false,
-                'used_at' => null,
-                'expires_at' => (new \DateTime())->add(date_interval_create_from_date_string($expires_after))
-            ]);
-        } else {
-            self::sendVerifyCode($verify);
+            $expiresAfter = sprintf('%d minutes', $this->getConfig()->profile->expires_after);
+            $verify = new Model_ProfileVerify;
+            $verify->profile_id = $profile->id;
+            $verify->code = hash('md5', uniqid().microtime(true));
+            $verify->used = false;
+            $verify->used_at = null;
+            $verify->expires_at = (new \DateTime())->add(date_interval_create_from_date_string($expiresAfter));
         }
-        //@codingStandardsIgnoreEnd
+
+        $verify->updated_at = new \DateTime();
+        $verify->save();
 
         return $response->withJson([
             'success' => true,
@@ -460,20 +458,20 @@ class Profile extends ControllerParser
             return false;
         
         // Define o objeto de data...
-        $dt_test = new \DateTime($date);
+        $dtTest = new \DateTime($date);
 
         // Se a data for diferente da informada, o formato é inválido
         // Pois avançou no tempo...
-        if ($dt_test->format('Y-m-d') !== $date)
+        if ($dtTest->format('Y-m-d') !== $date)
             return false;
 
         // Data atual do servidor...
-        $dt_result = $dt_test->diff(new \DateTime());
+        $dtResult = $dtTest->diff(new \DateTime());
 
         // Se houve inversão, a data informada é maior que a data
         // atual, ninguém nasce no futuro...
         // Crianças com menos de 5 anos não jogam isso...
-        if ($dt_result->invert || $dt_result->y < 5)
+        if ($dtResult->invert || $dtResult->y < 5)
             return false;
 
         // Retorna verdadeiro caso a validação de datas seja ok.

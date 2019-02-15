@@ -58,8 +58,17 @@ class Profile extends Eloquent_Model
      */
     public function changePassword($newPassword)
     {
-        $this->password = hash('sha512', $newPassword);
+        $this->password = $newPassword;
         $this->save();
+    }
+
+    /**
+     * Define a senha como sendo sha512 para o profile...
+     * @param string $value
+     */
+    public function setPasswordAttribute($value)
+    {
+        $this->attributes['password'] = hash('sha512', $value);
     }
 
     /**
