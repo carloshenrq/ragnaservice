@@ -89,10 +89,10 @@ abstract class ControllerParser extends CHZApp_Controller
     /**
      * Envia o e-mail com as informações passadas.
      */
-    public static function sendMail($subject, $to, $template, $data = array(), $type = 'text/html', $attach = array())
+    public static function sendMail($subject, $toAddress, $template, $data = array(), $type = 'text/html', $attach = array())
     {
         $app = Application::getInstance();
-        $app->getMailer()->sendFromTemplate($subject, $to, $template, array_merge($data, [
+        $app->getMailer()->sendFromTemplate($subject, $toAddress, $template, array_merge($data, [
             'config' => $app->getConfig()
         ]), $type, $attach);
 

@@ -117,7 +117,7 @@ class App extends CHZApp\Application
     public function installSchemaDefault($schema)
     {
         // Não realiza a instalação se estiver em modo install...
-        if ($this->getInstallMode())
+        if ($this->isInstallMode())
             return;
         
         $profileCreated = $schema->hasTable('profile');
@@ -285,7 +285,7 @@ class App extends CHZApp\Application
      * 
      * @return boolean
      */
-    public function getInstallMode()
+    public function isInstallMode()
     {
         return $this->installMode;
     }
@@ -496,22 +496,22 @@ class App extends CHZApp\Application
                 //@codingStandardsIgnoreEnd
                 $this->loadLanguage();
                 return;
-            } else {
-                //@codingStandardsIgnoreStart
-                $cacheLang = unserialize(file_get_contents($langCacheFile));
-                //@codingStandardsIgnoreEnd
-
-                if ($cacheLang[$this->getHash('__hash')] !== hash_file('sha512', $langFile)) {
-                    //@codingStandardsIgnoreStart
-                    unlink($langCacheFile);
-                    //@codingStandardsIgnoreEnd
-                    $this->loadLanguage();
-                    return;
-                }
-
-                // Carrega os dados de linguagem informados.
-                $this->langTranslate = $cacheLang;
             }
+
+            //@codingStandardsIgnoreStart
+            $cacheLang = unserialize(file_get_contents($langCacheFile));
+            //@codingStandardsIgnoreEnd
+
+            if ($cacheLang[$this->getHash('__hash')] !== hash_file('sha512', $langFile)) {
+                //@codingStandardsIgnoreStart
+                unlink($langCacheFile);
+                //@codingStandardsIgnoreEnd
+                $this->loadLanguage();
+                return;
+            }
+
+            // Carrega os dados de linguagem informados.
+            $this->langTranslate = $cacheLang;
         }
 
         $this->langLoaded = true;

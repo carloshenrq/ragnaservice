@@ -54,11 +54,11 @@ class Profile extends Eloquent_Model
     /**
      * Define a nova senha para o profile.
      * 
-     * @param string $new_password Nova senha
+     * @param string $newPassword Nova senha
      */
-    public function changePassword($new_password)
+    public function changePassword($newPassword)
     {
-        $this->password = hash('sha512', $new_password);
+        $this->password = hash('sha512', $newPassword);
         $this->save();
     }
 

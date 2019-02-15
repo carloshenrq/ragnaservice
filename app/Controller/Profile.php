@@ -241,6 +241,7 @@ class Profile extends ControllerParser
                     $v->expires_at->format('Y-m-d') >= (new \DateTime())->format('Y-m-d');
         });
 
+        //@codingStandardsIgnoreStart
         if ($verify === null) {
             $expires_after = sprintf('%d minutes', $this->getConfig()->profile->expires_after);
             Model_ProfileVerify::create([
@@ -253,6 +254,7 @@ class Profile extends ControllerParser
         } else {
             self::sendVerifyCode($verify);
         }
+        //@codingStandardsIgnoreEnd
 
         return $response->withJson([
             'success' => true,
