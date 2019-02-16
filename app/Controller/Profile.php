@@ -36,13 +36,13 @@ class Profile extends ControllerParser
 
         // Adicionado restrição para as rotas de não ser necessário realização de login.
         $this->applyRestrictionOnAllRoutes(function() {
-            return (($this->getApplication()->getPermission()&2) == 0);
+            return (($this->getApplication()->getPermission() & 2) == 0);
         }, ['verify_POST']);
 
         // Aplica em todas as outras rotas, necessidade para
         // ser realizado o login.
         $this->applyRestrictionOnAllRoutes(function() {
-            return (($this->getApplication()->getPermission()&2) != 0);
+            return (($this->getApplication()->getPermission() & 2) != 0);
         }, ['verify_POST', 'create_POST', 'login_POST', 'reset_POST', 'reset_confirm_POST']);
     }
 
@@ -105,31 +105,31 @@ class Profile extends ControllerParser
      */
     public function change_password_POST($response, $args)
     {
-        $old_pass = $this->post['old_pass'];
-        $new_pass = $this->post['new_pass'];
-        $cnf_pass = $this->post['cnf_pass'];
+        $oldPass = $this->post['old_pass'];
+        $newPass = $this->post['new_pass'];
+        $cnfPass = $this->post['cnf_pass'];
 
         $profile = $this->getApplication()->getProfile();
 
-        if ($profile->password !== hash('sha512', $old_pass))
+        if ($profile->password !== hash('sha512', $oldPass))
             return $response->withJson([
                 'error' => true,
                 'message' => __t('A Senha atual informada não confere com a senha atual.')
             ]);
         
-        if (hash('sha512', $new_pass) !== hash('sha512', $cnf_pass))
+        if (hash('sha512', $newPass) !== hash('sha512', $cnfPass))
             return $response->withJson([
                 'error' => true,
                 'message' => __t('As novas senhas digitadas não conferem.')
             ]);
         
-        if (hash('sha512', $old_pass) === hash('sha512', $new_pass))
+        if (hash('sha512', $oldPass) === hash('sha512', $newPass))
             return $response->withJson([
                 'error' => true,
                 'message' => __t('Sua nova senha, não pode ser igual antiga.')
             ]);
     
-        $profile->changePassword($new_pass);
+        $profile->changePassword($newPass);
 
         return $response->withJson([
             'success' => true,
@@ -151,7 +151,7 @@ class Profile extends ControllerParser
         $loginServer = $this->getApplication()->getFirstLoginServer();
 
         // Informações de data de nascimento
-        $dt_birth = null;
+        $dtBirth = null;
 
         // Verifica se o endereço de e-mail informado é valido
         if (self::verifyMail($email) === false)
@@ -167,7 +167,7 @@ class Profile extends ControllerParser
                     'error' => true,
                     'message' => __t('Data de nascimento informada é inválida ou idade inferior a 5 anos.')
                 ]);
-            $dt_birth = new \DateTime($birthdate);
+            $dtBirth = new \DateTime($birthdate);
         }
 
         // Verifica a existencia do e-mail informado...
@@ -186,9 +186,9 @@ class Profile extends ControllerParser
         $profile = Model_Profile::create([
             'name' => $name,
             'gender' => $gender,
-            'birthdate' => $dt_birth,
+            'birthdate' => $dtBirth,
             'email' => $email,
-            'password' => hash('sha512', $password),
+            'password' => $password,
             'permission' => $this->getConfig()->profile->permission,
             'blocked' => false,
             'blocked_reason' => null,
@@ -231,7 +231,7 @@ class Profile extends ControllerParser
             ['expires_at', '>=', (new \DateTime())->format('Y-m-d H:i:s')]
         ])->first();
 
-        if (is_null($verify))
+        if ($verify === null)
             return $response->withJson([
                 'error' => true,
                 'message' => __t('O Código de verificação informado já foi usado ou não existe.'),
@@ -268,18 +268,18 @@ class Profile extends ControllerParser
                     $v->expires_at->format('Y-m-d') >= (new \DateTime())->format('Y-m-d');
         });
 
-        if (is_null($verify)) {
-            $expires_after = sprintf('%d minutes', $this->getConfig()->profile->expires_after);
-            Model_ProfileVerify::create([
-                'profile_id' => $profile->id,
-                'code' => hash('md5', uniqid().microtime(true)),
-                'used' => false,
-                'used_at' => null,
-                'expires_at' => (new \DateTime())->add(date_interval_create_from_date_string($expires_after))
-            ]);
-        } else {
-            self::sendVerifyCode($verify);
+        if ($verify === null) {
+            $expiresAfter = sprintf('%d minutes', $this->getConfig()->profile->expires_after);
+            $verify = new Model_ProfileVerify;
+            $verify->profile_id = $profile->id;
+            $verify->code = hash('md5', uniqid() . microtime(true));
+            $verify->used = false;
+            $verify->used_at = null;
+            $verify->expires_at = (new \DateTime())->add(date_interval_create_from_date_string($expiresAfter));
         }
+
+        $verify->updated_at = new \DateTime();
+        $verify->save();
 
         return $response->withJson([
             'success' => true,
@@ -300,7 +300,7 @@ class Profile extends ControllerParser
             ['expires_at', '>=', (new \DateTime())->format('Y-m-d H:i:s')]
         ])->first();
 
-        if (is_null($reset))
+        if ($reset === null)
             return $response->withJson([
                 'error' => true,
                 'message' => __t('Código de reset de senha não é valido ou já foi usado.')
@@ -335,7 +335,7 @@ class Profile extends ControllerParser
             ['email', '=', $email]
         ])->first();
 
-        if (is_null($profile))
+        if ($profile === null)
             return $response->withJson([
                 'error' => true,
                 'message' => __t('Endereço de e-mail não pertence a nenhum perfil.'),
@@ -347,10 +347,10 @@ class Profile extends ControllerParser
         });
 
         // Se não houver resets em aberto, então irá criar um novo
-        if (is_null($reset)) {
+        if ($reset === null) {
             $reset = Model_ProfileReset::create([
                 'profile_id' => $profile->id,
-                'code' => hash('md5', uniqid().microtime(true)),
+                'code' => hash('md5', uniqid() . microtime(true)),
                 'used' => false,
                 'used_at' => null,
                 'expires_at' => (new \DateTime())->add(date_interval_create_from_date_string(sprintf('%d minutes',
@@ -401,7 +401,7 @@ class Profile extends ControllerParser
             'profile' => [
                 'name' => $token->profile->name,
                 'gender' => $token->profile->gender,
-                'birthdate' => ((is_null($token->profile->birthdate)) ? null : $token->profile->birthdate->format('Y-m-d'))
+                'birthdate' => (($token->profile->birthdate === null) ? null : $token->profile->birthdate->format('Y-m-d'))
             ]
         ]);
     }
@@ -485,20 +485,20 @@ class Profile extends ControllerParser
             return false;
         
         // Define o objeto de data...
-        $dt_test = new \DateTime($date);
+        $dtTest = new \DateTime($date);
 
         // Se a data for diferente da informada, o formato é inválido
         // Pois avançou no tempo...
-        if ($dt_test->format('Y-m-d') !== $date)
+        if ($dtTest->format('Y-m-d') !== $date)
             return false;
 
         // Data atual do servidor...
-        $dt_result = $dt_test->diff(new \DateTime());
+        $dtResult = $dtTest->diff(new \DateTime());
 
         // Se houve inversão, a data informada é maior que a data
         // atual, ninguém nasce no futuro...
         // Crianças com menos de 5 anos não jogam isso...
-        if ($dt_result->invert || $dt_result->y < 5)
+        if ($dtResult->invert || $dtResult->y < 5)
             return false;
 
         // Retorna verdadeiro caso a validação de datas seja ok.

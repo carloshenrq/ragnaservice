@@ -30,16 +30,16 @@ class ProfileResetObserver
         if ($reset->isDirty('used') && $reset->used) {
             $config = Application::getInstance()->getConfig();
 
-            $reset_chars = str_split($config->profile->reset_chars);
-            $reset_length = $config->profile->reset_length;
-            $reset_password = '';
+            $resetChars = str_split($config->profile->reset_chars);
+            $resetLength = $config->profile->reset_length;
+            $resetPassword = '';
 
-            while (strlen($reset_password) < $reset_length)
-                $reset_password .= $reset_chars[rand(1, count($reset_chars)) - 1];
+            while (strlen($resetPassword) < $resetLength)
+                $resetPassword .= $resetChars[rand(1, count($resetChars)) - 1];
 
-            $reset->profile->changePassword($reset_password);
+            $reset->profile->changePassword($resetPassword);
 
-            Controller_Profile::sendResetPass($reset, $reset_password);
+            Controller_Profile::sendResetPass($reset, $resetPassword);
         }
     }
 }

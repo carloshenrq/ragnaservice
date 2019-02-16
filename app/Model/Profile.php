@@ -85,12 +85,21 @@ class Profile extends Eloquent_Model
     /**
      * Define a nova senha para o profile.
      * 
-     * @param string $new_password Nova senha
+     * @param string $newPassword Nova senha
      */
-    public function changePassword($new_password)
+    public function changePassword($newPassword)
     {
-        $this->password = hash('sha512', $new_password);
+        $this->password = $newPassword;
         $this->save();
+    }
+
+    /**
+     * Define a senha como sendo sha512 para o profile...
+     * @param string $value
+     */
+    public function setPasswordAttribute($value)
+    {
+        $this->attributes['password'] = hash('sha512', $value);
     }
 
     /**
@@ -112,7 +121,7 @@ class Profile extends Eloquent_Model
         // Se o cadastro não existir ou estiver bloqueado
         // o login de usuário é negado!
         // Caso contrario, um novo token é criado e o usuário pode fazer login corretamente
-        if (is_null($profile) || $profile->blocked)
+        if ($profile === null || $profile->blocked)
             return false;
 
         // Deleta todos os tokens existentes para o usuário
@@ -127,7 +136,7 @@ class Profile extends Eloquent_Model
         $tokenProfile = TokenProfile::create([
             'token_id' => $token->id,
             'profile_id' => $profile->id,
-            'token' => hash('sha512', uniqid().microtime(true)),
+            'token' => hash('sha512', uniqid() . microtime(true)),
             'permission' => $profile->permission,
             'expires_at' => (new \DateTime())->add(date_interval_create_from_date_string('10 minutes')),
         ]);

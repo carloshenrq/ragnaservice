@@ -76,11 +76,11 @@ class App extends CHZApp\Application
         $this->profile = null;
 
         // Arquivo de configuração
-        $configFile = realpath(join(DIRECTORY_SEPARATOR, [
+        $configFile = join(DIRECTORY_SEPARATOR, [
             __DIR__,
             '..',
             'config.json'
-        ]));
+        ]);
 
         // Inicializa informações do slim com opções padrões de diretório...
         $this->setSmartyConfigs([
@@ -91,12 +91,13 @@ class App extends CHZApp\Application
         // Se conseguiu fazer a leitura dos dados
         // então estará tudo OK para não permitir
         // o módo de instalação.
-        if ($configFile !== false && file_exists($configFile)) {
+        //@codingStandardsIgnoreStart
+        if (file_exists($configFile)) {
             $configContent = file_get_contents($configFile);
+            //@codingStandardsIgnoreEnd
             $config = json_decode($configContent);
 
-
-            if (is_null($config))
+            if ($config === null)
                 throw new Exception(__t('Falha na leitura do arquivo de configuração.'));
 
             // Define as configurações da aplicação.
@@ -106,7 +107,7 @@ class App extends CHZApp\Application
             $this->setInstallMode(false);
 
             // Define informações de envio de email...
-            if (isset($config->mailer) && !is_null($config->mailer))
+            if (isset($config->mailer) && $config->mailer !== null)
                 $this->setMailerConfigs((array)$config->mailer);
 
             // Define os dados de conexão com o BD.
@@ -236,7 +237,7 @@ class App extends CHZApp\Application
     public function installSchemaDefault($schema)
     {
         // Não realiza a instalação se estiver em modo install...
-        if ($this->getInstallMode())
+        if ($this->isInstallMode())
             return;
         
         $profileCreated = $schema->hasTable('profile');
@@ -397,7 +398,7 @@ class App extends CHZApp\Application
                 'gender' => 'O',
                 'birthdate' => null,
                 'email' => 'a@a.com',
-                'password' => hash('sha512', 'admin'),
+                'password' => 'admin',
                 'permission' => 3,
                 'blocked' => false,
                 'blocked_reason' => null,
@@ -426,7 +427,7 @@ class App extends CHZApp\Application
      * 
      * @return boolean
      */
-    public function getInstallMode()
+    public function isInstallMode()
     {
         return $this->installMode;
     }
@@ -470,7 +471,7 @@ class App extends CHZApp\Application
         $profile = $this->getProfile();
 
         // Informação de token para o usuário logado.
-        if (!is_null($profile))
+        if ($profile !== null)
             return $profile->token->permission;
         
         // Dados do token por ID
@@ -531,7 +532,6 @@ class App extends CHZApp\Application
             __DIR__, 'Model'
         ]);
         $dirModel = new \DirectoryIterator($modelDir);
-        $modelClasses = [];
 
         foreach($dirModel as $fileModel) {
             if ($fileModel->isDot() || $fileModel->isDir())
@@ -540,8 +540,11 @@ class App extends CHZApp\Application
             // Retira a extensão '.php' do final do arquivo
             // e atribui ao vetor de models...
             $modelClass = '\\Model\\' . substr($fileModel->getFilename(), 0, -4);
+
+            //@codingStandardsIgnoreStart
             call_user_func([$modelClass, 'flushEventListeners']);
             call_user_func([$modelClass, 'boot']);
+            //@codingStandardsIgnoreEnd
         }
     }
 
@@ -592,7 +595,7 @@ class App extends CHZApp\Application
                 'port' => $login->port,
             ])->first();
 
-            if (is_null($l)) {
+            if ($l === null) {
                 // Cria a entrada do servidor...
                 $l = Model_ServerLogin::create([
                     'name' => $login->name,
@@ -616,7 +619,7 @@ class App extends CHZApp\Application
                     return $charServer->name == $char->name;
                 });
 
-                if (is_null($c)) {
+                if ($c === null) {
                     Model_ServerChar::create([
                         'login_id' => $l->id,
                         'name' => $char->name,
@@ -654,12 +657,14 @@ class App extends CHZApp\Application
 
         // Se não existir o arquivo de linguagem, então
         // será usado o idioma padrão.
+        //@codingStandardsIgnoreStart
         if (file_exists($langFile)) {
             // Caso exista informações de linguagem e não exista o arquivo
             // de cache, irá criar o arquivo de cache
             if (!file_exists($langCacheFile)) {
                 $aTmpLanguage = [];
                 $langTranslate = include($langFile);
+                //@codingStandardsIgnoreEnd
                 foreach ($langTranslate as $orig => $trans) {
                     $aTmpLanguage[$this->getHash($orig)] = $trans;
                 }
@@ -671,21 +676,27 @@ class App extends CHZApp\Application
                 => https://blog.blackfire.io/php-7-performance-improvements-packed-arrays.html
                 */
                 ksort($aTmpLanguage);
+                //@codingStandardsIgnoreStart
                 file_put_contents($langCacheFile, serialize($aTmpLanguage));
+                //@codingStandardsIgnoreEnd
                 $this->loadLanguage();
                 return;
-            } else {
-                $cacheLang = unserialize(file_get_contents($langCacheFile));
-
-                if ($cacheLang[$this->getHash('__hash')] !== hash_file('sha512', $langFile)) {
-                    unlink($langCacheFile);
-                    $this->loadLanguage();
-                    return;
-                }
-
-                // Carrega os dados de linguagem informados.
-                $this->langTranslate = $cacheLang;
             }
+
+            //@codingStandardsIgnoreStart
+            $cacheLang = unserialize(file_get_contents($langCacheFile));
+            //@codingStandardsIgnoreEnd
+
+            if ($cacheLang[$this->getHash('__hash')] !== hash_file('sha512', $langFile)) {
+                //@codingStandardsIgnoreStart
+                unlink($langCacheFile);
+                //@codingStandardsIgnoreEnd
+                $this->loadLanguage();
+                return;
+            }
+
+            // Carrega os dados de linguagem informados.
+            $this->langTranslate = $cacheLang;
         }
 
         $this->langLoaded = true;

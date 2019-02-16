@@ -80,35 +80,28 @@ class Server extends ControllerParser
     public static function fullStatus()
     {
         // Faz teste de verificação para próxima verificação.
-        $next_check = time() + \App::getInstance()->getConfig()->server->checkDelay;
+        $nextCheck = time() + $this->getConfig()->server->checkDelay;
 
-        return Model_ServerLogin::all()->each(function($login) use ($next_check) {
+        return Model_ServerLogin::all()->each(function($login) use ($nextCheck) {
             // Tenta efetuar o ping na porta de login...
             $errno = $errstr = '';
 
             if ($login->next_check < time()) {
-                $status = @fsockopen($login->address, $login->port, $errno, $errstr, 5);
-                $login->status = is_resource($status);
-                $login->next_check = $next_check;
+                $login->status = self::isPortOpen($login->address, $login->port);
+                $login->next_check = $nextCheck;
                 $login->save();
-                if ($status) fclose($status);
             }
 
             // Varre os char-severs para verificar o status de conexão
-            $login->charServers->each(function($char) use ($next_check) {
+            $login->charServers->each(function($char) use ($nextCheck) {
                 $errno = $errstr = '';
                 if ($char->next_check < time()) {
-                    $c_status = @fsockopen($char->char_address, $char->char_port, $errno, $errstr, 5);
-                    $m_status = @fsockopen($char->map_address, $char->map_port, $errno, $errstr, 5);
-                    $char->char_status = is_resource($c_status);
-                    $char->map_status = is_resource($m_status);
-                    $char->next_check = $next_check;
+                    $char->char_status = self::isPortOpen($char->char_address, $char->char_port);
+                    $char->map_status = self::isPortOpen($char->map_address, $char->map_port);
+                    $char->next_check = $nextCheck;
                     $char->save();
-                    if ($c_status) fclose($c_status);
-                    if ($m_status) fclose($m_status);
                 }
             });
-
         })->map(function($login) {
             $login->refresh();
             return (object)[
@@ -127,5 +120,27 @@ class Server extends ControllerParser
                 ]
             ];
         });
+    }
+
+    /**
+     * Verifica se a porta informada está aberta para receber conexões
+     * 
+     * @param string $address Endereço para conexão
+     * @param string $port Porta para conexão
+     * 
+     * @return boolean Verdadeiro caso esteja aberta
+     */
+    public static function isPortOpen($address, $port)
+    {
+        $bIsPortOpen = false;
+        //@codingStandardsIgnoreStart
+        $errno = $errstr = '';
+        $ptrFile = @fsockopen($address, $port, $errno, $errstr, 10);
+        $bIsPortOpen = is_resource($ptrFile);
+        if ($bIsPortOpen) fclose($ptrFile);
+        unset($errno);
+        unset($errstr);
+        //@codingStandardsIgnoreEnd
+        return $bIsPortOpen;
     }
 }

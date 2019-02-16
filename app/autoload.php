@@ -52,8 +52,10 @@ final class Autoload
         $classFile = str_replace('\\', DIRECTORY_SEPARATOR, $classFile);
 
         // Verifica se o arquivo existe se existir inclui o arquivo no código
+        //@codingStandardsIgnoreStart
         if(file_exists($classFile))
             require_once $classFile;
+        //@codingStandardsIgnoreEnd
     }
 }
 

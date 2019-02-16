@@ -17,8 +17,10 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+//@codingStandardsIgnoreStart
 require_once 'vendor/autoload.php';
 require_once 'app/autoload.php';
+//@codingStandardsIgnoreEnd
 
 // Registra o autoload para o site.
 Autoload::register();

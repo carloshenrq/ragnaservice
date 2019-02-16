@@ -28,6 +28,8 @@ class AppTest extends PHPUnit\Framework\TestCase
 	{
 		// Registra o autoload para o site.
 		Autoload::register();
+		// Carrega a classe App
+		Autoload::loader('App');
 	}
 
 	public function testAppInstance2()

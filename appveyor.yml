@@ -7,6 +7,11 @@ configuration:
 - php70
 - php71
 - php72
+- php73
+
+matrix:
+  allow_failures:
+    - configuration: php73
 
 branches:
   only:
@@ -80,3 +85,4 @@ after_test:
     - cd c:\projects\ragnaservice
     - appveyor DownloadFile https://codecov.io/bash -FileName codecov.sh
     - bash codecov.sh
+    - vendor/bin/codacycoverage clover coverage.xml

@@ -52,12 +52,12 @@ abstract class ControllerParser extends CHZApp_Controller
                 ])->first();
 
                 // Caso não exista o token, será retornado uma exception.
-                if (is_null($token))
+                if ($token === null)
                     throw new \Exception(__t('Token informado não é válido para esta requisição.'));
 
                 // Caso o token não esteja autorizado a fazer o login
                 // então exclui e manda a mensagem
-                if  (!($token->permission&1)) {
+                if  (!($token->permission & 1)) {
                     $token->delete();
                     throw new \Exception(__t('O Token informado não está autorizado.'));
                 }
@@ -89,15 +89,17 @@ abstract class ControllerParser extends CHZApp_Controller
     /**
      * Envia o e-mail com as informações passadas.
      */
-    public static function sendMail($subject, $to, $template, $data = array(), $type = 'text/html', $attach = array())
+    public static function sendMail($subject, $toAddress, $template, $data = array(), $type = 'text/html', $attach = array())
     {
         $app = Application::getInstance();
-        $app->getMailer()->sendFromTemplate($subject, $to, $template, array_merge($data, [
+        $app->getMailer()->sendFromTemplate($subject, $toAddress, $template, array_merge($data, [
             'config' => $app->getConfig()
         ]), $type, $attach);
 
+        //@codingStandardsIgnoreStart
         if (getenv('TRAVIS_CI_DEBUG') !== false && getenv('TRAVIS_CI_DEBUG') == 1)
             sleep(1);
+        //@codingStandardsIgnoreEnd
     }
 
 }

@@ -26,7 +26,7 @@ class Home extends ControllerParser
     public function init()
     {
         $this->addRouteRestriction('index_GET', function() {
-            return ($this->getApplication()->getPermission()&1) == 1;
+            return ($this->getApplication()->getPermission() & 1) == 1;
         });
     }
 
