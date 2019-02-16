@@ -52,7 +52,7 @@ class ProfileObserver
 
             Model_ProfileVerify::create([
                 'profile_id' => $profile->id,
-                'code' => hash('md5', uniqid().microtime(true)),
+                'code' => hash('md5', uniqid() . microtime(true)),
                 'used' => false,
                 'used_at' => null,
                 'expires_at' => (new \DateTime())->add(date_interval_create_from_date_string($expiresAfter))

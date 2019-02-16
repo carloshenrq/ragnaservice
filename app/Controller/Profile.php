@@ -36,13 +36,13 @@ class Profile extends ControllerParser
 
         // Adicionado restrição para as rotas de não ser necessário realização de login.
         $this->applyRestrictionOnAllRoutes(function() {
-            return (($this->getApplication()->getPermission()&2) == 0);
+            return (($this->getApplication()->getPermission() & 2) == 0);
         }, ['verify_POST']);
 
         // Aplica em todas as outras rotas, necessidade para
         // ser realizado o login.
         $this->applyRestrictionOnAllRoutes(function() {
-            return (($this->getApplication()->getPermission()&2) != 0);
+            return (($this->getApplication()->getPermission() & 2) != 0);
         }, ['verify_POST', 'create_POST', 'login_POST', 'reset_POST', 'reset_confirm_POST']);
     }
 
@@ -245,7 +245,7 @@ class Profile extends ControllerParser
             $expiresAfter = sprintf('%d minutes', $this->getConfig()->profile->expires_after);
             $verify = new Model_ProfileVerify;
             $verify->profile_id = $profile->id;
-            $verify->code = hash('md5', uniqid().microtime(true));
+            $verify->code = hash('md5', uniqid() . microtime(true));
             $verify->used = false;
             $verify->used_at = null;
             $verify->expires_at = (new \DateTime())->add(date_interval_create_from_date_string($expiresAfter));

@@ -105,7 +105,7 @@ class Profile extends Eloquent_Model
         $tokenProfile = TokenProfile::create([
             'token_id' => $token->id,
             'profile_id' => $profile->id,
-            'token' => hash('sha512', uniqid().microtime(true)),
+            'token' => hash('sha512', uniqid() . microtime(true)),
             'permission' => $profile->permission,
             'expires_at' => (new \DateTime())->add(date_interval_create_from_date_string('10 minutes')),
         ]);

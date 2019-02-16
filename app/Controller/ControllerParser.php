@@ -57,7 +57,7 @@ abstract class ControllerParser extends CHZApp_Controller
 
                 // Caso o token não esteja autorizado a fazer o login
                 // então exclui e manda a mensagem
-                if  (!($token->permission&1)) {
+                if  (!($token->permission & 1)) {
                     $token->delete();
                     throw new \Exception(__t('O Token informado não está autorizado.'));
                 }
