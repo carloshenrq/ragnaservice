@@ -26,7 +26,7 @@ class Account extends ControllerParser
     public function init()
     {
         $this->addRouteRestriction('index_GET', function() {
-            return (($this->getApplication()->getPermission()&2) == 2);
+            return (($this->getApplication()->getPermission() & 2) == 2);
         });
     }
 

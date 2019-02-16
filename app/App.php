@@ -152,7 +152,7 @@ class App extends CHZApp\Application
      *
      * @return boolean Nome do servidor
      */
-    public function getLoginMd5($loginServer)
+    public function isLoginMd5($loginServer)
     {
         if (!isset($this->loginConnections[$loginServer]))
             return null;

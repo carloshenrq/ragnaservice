@@ -54,14 +54,14 @@ class Profile extends Eloquent_Model
     {
         $app = \App::getInstance();
 
-        if (!is_null($loginServer) && is_null($app->getLoginConnection($loginServer)))
+        if ($loginServer !== null && $app->getLoginConnection($loginServer) === null)
             return false;
 
         // Grava o login-server do usuário.
         $this->loginServer = $loginServer;
         $this->save();
 
-        if (!is_null($charServer) && is_null($app->getCharServerConnection($loginServer, $charServer)))
+        if ($charServer !== null && $app->getCharServerConnection($loginServer, $charServer) === null)
             return false;
 
         $this->charServer = $charServer;
