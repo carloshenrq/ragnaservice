@@ -123,7 +123,7 @@ class Profile extends ControllerParser
         $gender = $this->post['gender'];
         $birthdate = $this->post['birthdate'];
         $email = $this->post['email'];
-        $password =$this->post['password'];
+        $password = $this->post['password'];
 
         // Informações de data de nascimento
         $dtBirth = null;
@@ -323,7 +323,7 @@ class Profile extends ControllerParser
         if ($reset === null) {
             $reset = Model_ProfileReset::create([
                 'profile_id' => $profile->id,
-                'code' => hash('md5', uniqid().microtime(true)),
+                'code' => hash('md5', uniqid() . microtime(true)),
                 'used' => false,
                 'used_at' => null,
                 'expires_at' => (new \DateTime())->add(date_interval_create_from_date_string(sprintf('%d minutes',
