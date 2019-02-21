@@ -26,16 +26,33 @@ use \Psr\Http\Message\ResponseInterface;
 use \Model\TokenProfile as Model_TokenProfile;
 use \App as Application;
 
+/**
+ * Controlador abstrato herdado pelos demais controladores
+ * da aplicação. Tem como função garantir os métodos
+ * básicos e essenciais que a aplicação mais usa.
+ */
 abstract class ControllerParser extends CHZApp_Controller
 {
     /**
      * @see \App::getConfig()
+     * 
+     * @return object
      */
     public function getConfig()
     {
         return $this->getApplication()->getConfig();
     }
 
+    /**
+     * Método que realiza o roteamento da requisição e tratamento
+     * do token para os métodos
+     * 
+     * @param \Psr\Http\Message\ServerRequestInterface $request  Objeto de requisição
+     * @param \Psr\Http\Message\ResponseInterface      $response Objeto de resposta
+     * @param array                                    $args     Argumentos da requisição
+     * 
+     * @return object
+     */
     public function __router(ServerRequestInterface $request, ResponseInterface $response, $args)
     {
         try
@@ -87,7 +104,17 @@ abstract class ControllerParser extends CHZApp_Controller
     }
 
     /**
-     * Envia o e-mail com as informações passadas.
+     * Envia um e-mail usando o arquivo template que é compilado pelo
+     * Smarty e envia para o endereço informado.
+     * 
+     * @param string $subject   Assunto do e-mail
+     * @param array  $toAddress Endereço que o e-mail será enviado.
+     * @param string $template  Nome do arquivo em '/app/View/' que será compilado
+     * @param array  $data      Dados associativos que serão usados para a compilação.
+     * @param string $type      Tipo do corpo de e-mail
+     * @param array  $attach    Anexos que serão enviados por e-mail
+     * 
+     * @return void
      */
     public static function sendMail($subject, $toAddress, $template, $data = array(), $type = 'text/html', $attach = array())
     {

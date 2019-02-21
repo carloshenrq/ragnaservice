@@ -23,8 +23,18 @@ use \App as Application;
 use \Controller\Profile as Controller_Profile;
 use \Model\ProfileVerify as Model_ProfileVerify;
 
+/**
+ * Observador de eventos de verificação de perfil
+ */
 class ProfileVerifyObserver
 {
+    /**
+     * Método executado antes de gravar alterações no banco de dados
+     * 
+     * @param \Model\ProfileVerify $verify Informações de verificação de perfil
+     * 
+     * @return void
+     */
     public function updating(Model_ProfileVerify $verify)
     {
         // Caso o código tenha sido usado, então, irá 
@@ -44,7 +54,11 @@ class ProfileVerifyObserver
     }
 
     /**
-     * Envia o código de verificação para o perfil quando é criado
+     * Envia o código de verificação para o perfil quando é criado.
+     * 
+     * @param \Model\ProfileVerify $verify Informações de verificação do perfil
+     * 
+     * @return void
      */
     public function created(Model_ProfileVerify $verify)
     {

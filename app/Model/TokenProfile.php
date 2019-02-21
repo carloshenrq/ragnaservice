@@ -21,13 +21,27 @@ namespace Model;
 
 use \Illuminate\Database\Eloquent\Model as Eloquent_Model;
 
+/**
+ * Modelo para os tokens de perfil.
+ * São referencias as sessões dos usuários
+ */
 class TokenProfile extends Eloquent_Model
 {
+    /**
+     * Obtém o token pai para o token de perfil.
+     * 
+     * @return \Model\Token
+     */
     public function mainToken()
     {
         return $this->belongsTo('\Model\Token', 'token_id', 'id');
     }
 
+    /**
+     * Obtem o perfil que está vinculado a este token.
+     * 
+     * @return \Model\Profile
+     */
     public function profile()
     {
         return $this->belongsTo('\Model\Profile', 'profile_id', 'id');

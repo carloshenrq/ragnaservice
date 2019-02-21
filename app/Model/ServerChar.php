@@ -21,10 +21,15 @@ namespace Model;
 
 use \Illuminate\Database\Eloquent\Model as Eloquent_Model;
 
+/**
+ * Modelo para obter os dados do servidor de personagens do banco de dados.
+ */
 class ServerChar extends Eloquent_Model
 {
     /**
      * Obtém o login-server relacionado a este char-server.
+     * 
+     * @return \Model\ServerLogin
      */
     public function loginServer()
     {

@@ -22,8 +22,17 @@ namespace Controller;
 use \Model\ServerLogin as Model_ServerLogin;
 use \Model\ServerChar as Model_ServerChar;
 
+/**
+ * Controlador de requisições referentes a dados
+ * do servidores
+ */
 class Server extends ControllerParser
 {
+    /**
+     * @see ControllerParser::init()
+     * 
+     * @return void
+     */
     public function init()
     {
         $this->addRouteRegexp('/^\/server\/status\/char\/([a-zA-Z0-9]+)$/i', '/server/status/char/{name}');
@@ -31,6 +40,11 @@ class Server extends ControllerParser
 
     /**
      * Status de servidor de personagem solicitado.
+     * 
+     * @param object $response Objeto de resposta da requisição
+     * @param array  $args     Parametros para a requisição
+     * 
+     * @return object
      */
     public function status_char_GET($response, $args)
     {
@@ -57,6 +71,11 @@ class Server extends ControllerParser
 
     /**
      * Status de servidor retorna a rota padrão.
+     * 
+     * @param object $response Objeto de resposta da requisição
+     * @param array  $args     Parametros para a requisição
+     * 
+     * @return object
      */
     public function status_GET($response, $args)
     {
@@ -65,6 +84,11 @@ class Server extends ControllerParser
 
     /**
      * Verifica os dados de status dos servidores caso necessário.
+     * 
+     * @param object $response Objeto de resposta da requisição
+     * @param array  $args     Parametros para a requisição
+     * 
+     * @return object
      */
     public function index_GET($response, $args)
     {
@@ -123,12 +147,12 @@ class Server extends ControllerParser
     }
 
     /**
-     * Verifica se a porta informada está aberta para receber conexões
+     * Verifica se a porta informada está aberta para receber conexões.
      * 
      * @param string $address Endereço para conexão
-     * @param string $port Porta para conexão
+     * @param string $port    Porta para conexão
      * 
-     * @return boolean Verdadeiro caso esteja aberta
+     * @return boolean
      */
     public static function isPortOpen($address, $port)
     {

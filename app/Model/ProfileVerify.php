@@ -22,8 +22,16 @@ namespace Model;
 use \Illuminate\Database\Eloquent\Model as Eloquent_Model;
 use \Model\Observer\ProfileVerifyObserver as Observer_ProfileVerify;
 
+/**
+ * Modelo para dados de verificação do perfil.
+ */
 class ProfileVerify extends Eloquent_Model
 {
+    /**
+     * Obtém o perfil que está vinculado ao objeto de verificação.
+     * 
+     * @return \Model\Profile
+     */
     public function profile()
     {
         return $this->belongsTo('\Model\Profile', 'profile_id', 'id');
@@ -47,6 +55,8 @@ class ProfileVerify extends Eloquent_Model
 
     /**
      * @see Eloquent_Model::boot()
+     * 
+     * @return void
      */
     public static function boot()
     {
