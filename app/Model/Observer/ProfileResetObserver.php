@@ -23,8 +23,19 @@ use \Model\ProfileReset as Model_ProfileReset;
 use \Controller\Profile as Controller_Profile;
 use \App as Application;
 
+/**
+ * Classe observadora dos eventos para reset de perfil.
+ */
 class ProfileResetObserver
 {
+    /**
+     * Executa antes de gravar os dados no banco de dados para
+     * o reset de perfil.
+     * 
+     * @param \Model\ProfileReset $reset Modelo que contém os dados de reset
+     * 
+     * @return void
+     */
     public function updating(Model_ProfileReset $reset)
     {
         if ($reset->isDirty('used') && $reset->used) {

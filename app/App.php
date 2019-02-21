@@ -22,44 +22,58 @@ use Model\Profile as Model_Profile;
 use Model\ServerLogin as Model_ServerLogin;
 use Model\ServerChar as Model_ServerChar;
 
+/**
+ * 
+ */
 class App extends CHZApp\Application
 {
     /**
      * Verifica se a aplicação está em modo de instalação
+     * 
      * @var boolean
      */
     private $installMode;
 
     /**
      * Perfil que está logado na aplicação.
+     * 
      * @var Model_Profile
      */
     private $profile;
 
     /**
      * Dados de configuração da aplicação.
+     * 
      * @var stdObject
      */
     private $config;
 
     /**
      * Define o idioma de uso
+     * 
      * @var string
      */
     private $lang;
 
     /**
      * Define informações de tradução
+     * 
      * @var boolean
      */
     private $langLoaded;
 
     /**
      * Dados de tradução para o painel de controle.
+     * 
      * @var array
      */
     private $langTranslate;
 
+    /**
+     * @see CHZApp\Application
+     * 
+     * @return void
+     */
     public function init()
     {
         // Define a aplicação em modo de instalação.
@@ -112,7 +126,9 @@ class App extends CHZApp\Application
     /**
      * Faz a instalação do schema padrão de conexão.
      * 
-     * @param object $schema
+     * @param object $schema Instância do banco de dados
+     * 
+     * @return void
      */
     public function installSchemaDefault($schema)
     {
@@ -273,7 +289,9 @@ class App extends CHZApp\Application
     /**
      * Define o modo de instalação para o service.
      * 
-     * @param boolean $installMode
+     * @param bool $installMode Informa se está em modo de instalação
+     * 
+     * @return void
      */
     public function setInstallMode($installMode)
     {
@@ -294,7 +312,9 @@ class App extends CHZApp\Application
      * Define o perfil que está logado na aplicação para
      * esta sessão.
      * 
-     * @param Model_Profile $profile
+     * @param Model_Profile $profile Perfil que está logado
+     * 
+     * @return void
      */
     public function setProfile(Model_Profile $profile)
     {
@@ -342,7 +362,9 @@ class App extends CHZApp\Application
     /**
      * Define as configurações para a aplicação.
      * 
-     * @param object $config
+     * @param object $config Configurações que serão usadas pela aplicação
+     * 
+     * @return void
      */
     public function setConfig($config)
     {
@@ -363,7 +385,9 @@ class App extends CHZApp\Application
     /**
      * Define a linguagem de uso do sistema.
      *
-     * @param string $lang
+     * @param string $lang Idioma a ser utilizado
+     * 
+     * @return void
      */
     public function setLang($lang)
     {
@@ -383,6 +407,8 @@ class App extends CHZApp\Application
 
     /**
      * Método garante a chamada de todos os models a serem registrados...
+     * 
+     * @return void
      */
     private function registerModels()
     {
@@ -408,6 +434,8 @@ class App extends CHZApp\Application
 
     /**
      * Realiza o tratamento de gravar os dados de servidor direto no banco de dados.
+     * 
+     * @return void
      */
     public function parseServers()
     {
@@ -451,7 +479,9 @@ class App extends CHZApp\Application
     }
 
     /**
-     * Carrega o arquivo de traduções para o sistema
+     * Carrega o arquivo de traduções para o sistema.
+     * 
+     * @return void
      */
     public function loadLanguage()
     {
@@ -519,9 +549,9 @@ class App extends CHZApp\Application
     /**
      * Obtém uma tradução para a mensagem enviada e para o arquivo informado.
      *
-     * @param string $message
+     * @param string $message Mensagem no texto original para ser traduzida
      *
-     * @return string Mensagem traduzida...
+     * @return string
      */
     public function getTranslate($message)
     {
@@ -538,7 +568,7 @@ class App extends CHZApp\Application
      * 
      * @param string $str String a ser usada para o hashing
      *
-     * @return integer Inteiro do hashing
+     * @return integer
      */
     public function getHash($str)
     {

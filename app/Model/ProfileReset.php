@@ -22,9 +22,16 @@ namespace Model;
 use \Illuminate\Database\Eloquent\Model as Eloquent_Model;
 use \Model\Observer\ProfileResetObserver as Observer_ProfileReset;
 
-
+/**
+ * Modelo para obter os dados referentes ao reset de perfil
+ */
 class ProfileReset extends Eloquent_Model
 {
+    /**
+     * Obtém o perfil do objeto de reset
+     * 
+     * @return \Model\Profile
+     */
     public function profile()
     {
         return $this->belongsTo('\Model\Profile', 'profile_id', 'id');
@@ -48,6 +55,8 @@ class ProfileReset extends Eloquent_Model
 
     /**
      * @see Eloquent_Model::boot()
+     * 
+     * @return void
      */
     public static function boot()
     {

@@ -25,8 +25,16 @@ use \Model\Profile as Model_Profile;
 use \Model\ProfileVerify as Model_ProfileVerify;
 use \Model\ProfileReset as Model_ProfileReset;
 
+/**
+ * Classe controladora das requisições de perfil
+ */
 class Profile extends ControllerParser
 {
+    /**
+     * @see ControllerParser::init()
+     * 
+     * @return void
+     */
     public function init()
     {
         // Rota de verificação depende da configuração.
@@ -48,6 +56,11 @@ class Profile extends ControllerParser
 
     /**
      * Faz a chamada para alterações de informações do perfil.
+     * 
+     * @param object $response Objeto de resposta da requisição
+     * @param array  $args     Parametros para a requisição
+     * 
+     * @return void
      */
     public function change_settings_POST($response, $args)
     {
@@ -78,6 +91,11 @@ class Profile extends ControllerParser
     /**
      * Faz a alteração de senha para o perfil que está fazendo
      * a chamada.
+     * 
+     * @param object $response Objeto de resposta da requisição
+     * @param array  $args     Parametros para a requisição
+     * 
+     * @return void
      */
     public function change_password_POST($response, $args)
     {
@@ -115,6 +133,11 @@ class Profile extends ControllerParser
 
     /**
      * Realiza a criação de uma nova conta.
+     * 
+     * @param object $response Objeto de resposta da requisição
+     * @param array  $args     Parametros para a requisição
+     * 
+     * @return void
      */
     public function create_POST($response, $args)
     {
@@ -186,8 +209,8 @@ class Profile extends ControllerParser
     /**
      * Realiza a verificação de um login que não está verificado.
      * 
-     * @param object $response
-     * @param array $args
+     * @param object $response Objeto de resposta da requisição
+     * @param array  $args     Parametros para a requisição
      * 
      * @return object
      */
@@ -222,6 +245,11 @@ class Profile extends ControllerParser
 
     /**
      * Faz o pedido de reenvio das validações para o usuário.
+     * 
+     * @param object $response Objeto de resposta da requisição
+     * @param array  $args     Parametros para a requisição
+     * 
+     * @return void
      */
     public function verify_resend_POST($response, $args)
     {
@@ -262,6 +290,11 @@ class Profile extends ControllerParser
 
     /**
      * Responde a confirmação de reset do usuário.
+     * 
+     * @param object $response Objeto de resposta da requisição
+     * @param array  $args     Parametros para a requisição
+     * 
+     * @return void
      */
     public function reset_confirm_POST($response, $args)
     {
@@ -290,7 +323,12 @@ class Profile extends ControllerParser
     }
 
     /**
-     * Faz o pedido de reset 
+     * Faz o pedido de reset
+     * 
+     * @param object $response Objeto de resposta da requisição
+     * @param array  $args     Parametros para a requisição
+     * 
+     * @return void
      */
     public function reset_POST($response, $args)
     {
@@ -344,8 +382,8 @@ class Profile extends ControllerParser
     /**
      * Realiza o login do usuário de acordo com os dados e senha informados.
      * 
-     * @param object $response
-     * @param array $args
+     * @param object $response Objeto de resposta da requisição
+     * @param array  $args     Parametros para a requisição
      * 
      * @return object
      */
@@ -380,7 +418,12 @@ class Profile extends ControllerParser
     }
 
     /**
-     * Envia o e-mail contendo a nova senha do usuário
+     * Envia o e-mail contendo a nova senha do usuário.
+     * 
+     * @param Model_ProfileReset $reset    Dados de senha resetada do perfil
+     * @param string             $password Nova senha do perfil
+     * 
+     * @return void
      */
     public static function sendResetPass(Model_ProfileReset $reset, $password)
     {
@@ -398,6 +441,10 @@ class Profile extends ControllerParser
 
     /**
      * Envia o e-mail de reset referente ao perfil solicitado.
+     * 
+     * @param Model_ProfileReset $reset Dados de reset para o perfil
+     * 
+     * @return void
      */
     public static function sendResetCode(Model_ProfileReset $reset)
     {
@@ -417,6 +464,8 @@ class Profile extends ControllerParser
      * Envia o e-mail verificação para o perfil que estiver esperando os dados de verificação.
      *
      * @param Model_ProfileVerify $verify Informações de verificação
+     * 
+     * @return void
      */
     public static function sendVerifyCode(Model_ProfileVerify $verify)
     {
@@ -435,9 +484,9 @@ class Profile extends ControllerParser
     /**
      * Verifica um endereço de e-mail.
      * 
-     * @param string $email
+     * @param string $email Endereço de e-mail a ser validado
      * 
-     * @return boolean Verdadeiro caso o e-mail seja válido.
+     * @return bool
      */
     public static function verifyMail($email)
     {
@@ -446,10 +495,11 @@ class Profile extends ControllerParser
 
     /**
      * Faz a validação de uma data de nascimento.
+     * Retorna verdadeiro em caso da data ser válida.
      * 
-     * @param string $date
+     * @param string $date Data de nascimento em formato 'YYYY-MM-DD'
      * 
-     * @return boolean Verdadeiro caso seja válida
+     * @return bool
      */
     public static function verifyBirthDate($date)
     {

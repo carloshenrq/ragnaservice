@@ -23,10 +23,17 @@ use \Model\Profile as Model_Profile;
 use \Model\ProfileVerify as Model_ProfileVerify;
 use \App as Application;
 
+/**
+ * Classe observadora para os eventos de perfil
+ */
 class ProfileObserver
 {
     /**
      * Pouco antes de atualizar informações da conta do jogador...
+     * 
+     * @param \Model\Profile $profile perfil que está sendo atualizado
+     * 
+     * @return void
      */
     public function updating(Model_Profile $profile)
     {
@@ -38,6 +45,10 @@ class ProfileObserver
     /**
      * Criação de contas faz a verificação se há necessidade
      * da criação de um código de verificação
+     * 
+     * @param \Model\Profile $profile Perfil que foi criado
+     * 
+     * @return void
      */
     public function created(Model_Profile $profile)
     {

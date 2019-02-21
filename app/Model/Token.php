@@ -26,6 +26,11 @@ use \Illuminate\Database\Eloquent\Model as Eloquent_Model;
  */
 class Token extends Eloquent_Model
 {
+    /**
+     * Obtém todos os tokens de perfil vinculados ao token principal
+     * 
+     * @return array
+     */
     public function tokenProfile()
     {
         return $this->hasMany('\Model\TokenProfile', 'id', 'token_id');
@@ -35,7 +40,9 @@ class Token extends Eloquent_Model
      * Obtém o token padrão que está ativo
      * e pode ser usado para requisições normais.
      * 
-     * @param object $query
+     * @param object $query Padrão informado pelo Eloquent
+     * 
+     * @return \Model\Token
      */
     public function scopeDefaultActive($query)
     {

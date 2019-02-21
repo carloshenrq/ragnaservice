@@ -22,18 +22,36 @@ namespace Model;
 use \Illuminate\Database\Eloquent\Model as Eloquent_Model;
 use \Model\Observer\ProfileObserver as Observer_Profile;
 
+/**
+ * Modelo para os dados de perfil que estão no banco de dados.
+ */
 class Profile extends Eloquent_Model
 {
+    /**
+     * Token de acesso referente ao perfil e suas permissões.
+     * 
+     * @return \Model\TokenProfile
+     */
     public function token()
     {
         return $this->hasOne('\Model\TokenProfile');
     }
 
+    /**
+     * Obtém todas as verificações realizadas pelo perfil.
+     * 
+     * @return array
+     */
     public function verifications()
     {
         return $this->hasMany('\Model\ProfileVerify', 'profile_id', 'id');
     }
 
+    /**
+     * Obtém todos os reset de senha realizados pelo perfil
+     * 
+     * @return array
+     */
     public function resets()
     {
         return $this->hasMany('\Model\ProfileReset', 'profile_id', 'id');
@@ -41,7 +59,12 @@ class Profile extends Eloquent_Model
 
     /**
      * Faz alterações de informações padrões do perfil
-     * do usuários
+     * 
+     * @param string $name      Novo nome do perfil
+     * @param string $gender    Novo gênero do perfil
+     * @param string $birthdate Nova data de nascimento do perfil
+     * 
+     * @return void
      */
     public function changeSettings($name, $gender, $birthdate)
     {
@@ -55,6 +78,8 @@ class Profile extends Eloquent_Model
      * Define a nova senha para o profile.
      * 
      * @param string $newPassword Nova senha
+     * 
+     * @return void
      */
     public function changePassword($newPassword)
     {
@@ -63,8 +88,11 @@ class Profile extends Eloquent_Model
     }
 
     /**
-     * Define a senha como sendo sha512 para o profile...
-     * @param string $value
+     * Método para garantir o padrão de senha sempre com o SHA512
+     * 
+     * @param string $value Senha que será definida para o perfil
+     * 
+     * @return void
      */
     public function setPasswordAttribute($value)
     {
@@ -74,10 +102,11 @@ class Profile extends Eloquent_Model
     /**
      * Verifica os dados de login que foram informados...
      * 
-     * @param string $email
-     * @param string $password
+     * @param object $query    Objeto padrão do Eloquent
+     * @param string $email    Endereço de e-mail do perfil
+     * @param string $password Senha do perfil
      * 
-     * @return mixed Retornará false caso não seja encontrado o login.
+     * @return mixed Falso em caso de falha
      */
     public function scopeLogin($query, $email, $password)
     {
@@ -136,6 +165,8 @@ class Profile extends Eloquent_Model
 
     /**
      * @see Eloquent_Model::boot()
+     * 
+     * @return void
      */
     public static function boot()
     {

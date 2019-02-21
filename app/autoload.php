@@ -19,12 +19,13 @@
 
 /**
  * Classe para realizar o autoloading dos dados.
- *
  */
 final class Autoload
 {
     /**
      * Método para registrar o autoload.
+     * 
+     * @return void
      */
     public static function register()
     {
@@ -40,6 +41,8 @@ final class Autoload
      * Método para carregar as classes do framework.
      *
      * @param string $className Nome da classe que irá ser carregada
+     * 
+     * @return void
      */
     public static function loader($className)
     {
