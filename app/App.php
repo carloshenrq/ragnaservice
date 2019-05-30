@@ -21,6 +21,7 @@ use Model\Token as Model_Token;
 use Model\Profile as Model_Profile;
 use Model\ServerLogin as Model_ServerLogin;
 use Model\ServerChar as Model_ServerChar;
+use Model\Update as Model_Update;
 
 /**
  * 
@@ -119,6 +120,7 @@ class App extends CHZApp\Application
             $this->setEloquentConfigs($config->connections);
             $this->registerModels();
             $this->loadLanguage();
+            $this->applyUpdate();
             $this->parseServers();
         }
     }
@@ -137,6 +139,7 @@ class App extends CHZApp\Application
             return;
         
         $profileCreated = $schema->hasTable('profile');
+
 
         if (!$schema->hasTable('token')) {
             $schema->create('token', function($table) {
@@ -284,6 +287,15 @@ class App extends CHZApp\Application
                 'ga_secret' => null,
             ]);
         }
+
+        if (!$schema->hasTable('update')) {
+            $schema->create('update', function($table) {
+                $table->engine = 'MyISAM';
+                $table->increments('id');
+                $table->string('update', 12)->unique();
+                $table->timestamps();
+            });
+        }
     }
 
     /**
@@ -306,6 +318,20 @@ class App extends CHZApp\Application
     public function isInstallMode()
     {
         return $this->installMode;
+    }
+
+    /**
+     * Obtém o objeto de schema de Conexão com o banco de dados.
+     * 
+     * @param string $name Nome da conexão com o banco de dados
+     * 
+     * @return object
+     */
+    public function getSchema($name = 'default')
+    {
+        return $this->getEloquent()
+                    ->getManager()
+                    ->schema($name);
     }
 
     /**
@@ -429,6 +455,65 @@ class App extends CHZApp\Application
             call_user_func([$modelClass, 'flushEventListeners']);
             call_user_func([$modelClass, 'boot']);
             //@codingStandardsIgnoreEnd
+        }
+    }
+
+    /**
+     * Aplica atualizações automaticas contidas na pasta de atualização
+     * para o sistema.
+     * 
+     * @return void
+     */
+    private function applyUpdate()
+    {
+        //@codingStandardsIgnoreStart
+        $updatePath = realpath(join(DIRECTORY_SEPARATOR, [
+            __DIR__, '..', 'update'
+        ]));
+        //@codingStandardsIgnoreEnd
+
+        // Obtém a última atualização realizada...
+        // Se nenhuma foi aplicada, usará a data de 197001010000...
+        $lastUpdate = Model_Update::orderBy('id', 'DESC')->first();
+        if ($lastUpdate === null) {
+            $lastUpdate = Model_Update::create([
+                'update' => '197001010000'
+            ])->refresh();
+        }
+
+        $updateFiles = [];
+        $directoryIterator = new DirectoryIterator($updatePath);
+        foreach ($directoryIterator as $archive) {
+            if ($archive->isDot() || $archive->isDir() || $archive->isLink() || !$archive->isReadable())
+                continue;
+
+            if (!preg_match('/^([0-9]{12})\.php$/i', $archive->getFilename(), $match))
+                continue;
+
+            $updateFiles[] = $archive->getPathname();
+        }
+
+        // Se não existir arquivos para atualização, então
+        // desnecessário seguir...
+        if (count($updateFiles) == 0)
+            return;
+
+        // Varre os arquivos de atualização e tenta aplicar eles...
+        foreach ($updateFiles as $file) {
+            //@codingStandardsIgnoreStart
+            $update = include($file);
+            //@codingStandardsIgnoreEnd
+
+            if (!is_callable($update))
+                throw new Exception('Update file in incorrect format.');
+
+            if ($update() === false)
+                throw new Exception('Can\'t apply this update file.');
+
+            $basename = substr(basename($file), 0, -4);
+            Model_Update::create([
+                'update' => $basename
+            ]);
         }
     }
 
